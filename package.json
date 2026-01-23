@@ -1,0 +1,24 @@
+{
+  "name": "base-mini-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.2.4"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.19",
+    "@wagmi/connectors": "^7.1.5",
+    "@wagmi/core": "^3.3.1",
+    "@walletconnect/modal": "^2.7.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "viem": "^2.44.4",
+    "wagmi": "^3.4.1"
+  }
+}
