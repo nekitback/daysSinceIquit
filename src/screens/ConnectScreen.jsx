@@ -1,35 +1,24 @@
 import React from "react";
-import { useAccount, useConnect } from "wagmi";
+import { useConnect } from "wagmi";
+import "../styles/connect.css";
 
 export default function ConnectScreen() {
-  const { isConnected, address } = useAccount();
-  const { connect, connectors, isPending, error } = useConnect();
-
-  if (isConnected) {
-    return (
-      <div className="screen center">
-        <h2>Connected</h2>
-        <p>{address}</p>
-      </div>
-    );
-  }
+  const { connect, connectors, error, isPending } = useConnect();
 
   return (
-    <div className="screen center">
-      <h1>Days since I quit</h1>
+    <div className="connect-screen">
+      <div className="connect-title">Days Since I Quit</div>
 
       <button
+        className="connect-button"
         onClick={() => connect({ connector: connectors[0] })}
         disabled={isPending}
       >
-        {isPending ? "Connecting..." : "Connect Wallet"}
+        Connect Wallet
       </button>
 
-      {error && (
-        <p style={{ color: "red", marginTop: 12 }}>
-          {error.message}
-        </p>
-      )}
+      {error && <div className="connect-error">{error.message}</div>}
     </div>
   );
 }
+

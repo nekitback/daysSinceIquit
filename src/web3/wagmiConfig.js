@@ -5,11 +5,12 @@ import { injected } from "wagmi/connectors";
 export const wagmiConfig = createConfig({
   chains: [baseSepolia],
   connectors: [
-    injected({
-      shimDisconnect: true,
-    }),
+    injected(),
   ],
   transports: {
     [baseSepolia.id]: http(),
   },
 });
+
+
+
