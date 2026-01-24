@@ -6,7 +6,6 @@ import SlideMenu from './components/SlideMenu'
 import CounterCard from './components/CounterCard'
 import ColorPicker from './components/ColorPicker'
 import CategorySelector from './components/CategorySelector'
-import Button from './components/Button'
 import { useStore } from './store/useStore'
 import { 
   useStartCounter, 

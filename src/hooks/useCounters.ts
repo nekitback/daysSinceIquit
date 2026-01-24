@@ -6,7 +6,7 @@ import { useCountersCount, useGetCounter } from './useContract'
 export function useCounters() {
   const { address } = useAccount()
   const { count, refetch: refetchCount } = useCountersCount()
-  const { addCounter, counters } = useStore()
+  const { counters } = useStore()
 
   useEffect(() => {
     if (!address || count === 0) return

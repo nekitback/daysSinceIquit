@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xF25c60e5600E5C023752f0BF0ed10bb79994f84A') as const
+export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xF25c60e5600E5C023752f0BF0ed10bb79994f84A') as `0x${string}`
 
 export const CONTRACT_ABI = [
   {
