@@ -21,6 +21,16 @@ import type { Counter } from './types'
 
 function App() {
   const { isConnected, address } = useAccount()
+
+  useEffect(() => {
+    if (window.ethereum && !isConnected) {
+      const injectedConnector = connectors.find(c => c.type === 'injected')
+      if (injectedConnector) {
+        connect({ connector: injectedConnector })
+      }
+    }
+  }, [])
+
   const [menuOpen, setMenuOpen] = useState(false)
   const { 
     selectedColor, 
