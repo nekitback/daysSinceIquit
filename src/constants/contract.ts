@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xF25c60e5600E5C023752f0BF0ed10bb79994f84A') as `0x${string}`
+export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xf4a1037F03aE7586213Cd0F03C50457fE156946d') as `0x${string}`
 
 export const CONTRACT_ABI = [
   {
@@ -45,9 +45,22 @@ export const CONTRACT_ABI = [
     "inputs": [
       { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
       { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "startedAt", "type": "uint64" }
+      { "indexed": false, "internalType": "uint64", "name": "startedAt", "type": "uint64" },
+      { "indexed": false, "internalType": "string", "name": "category", "type": "string" },
+      { "indexed": false, "internalType": "string", "name": "color", "type": "string" }
     ],
     "name": "CounterStarted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "indexed": false, "internalType": "string", "name": "category", "type": "string" },
+      { "indexed": false, "internalType": "string", "name": "color", "type": "string" }
+    ],
+    "name": "MetadataUpdated",
     "type": "event"
   },
   {
@@ -86,9 +99,11 @@ export const CONTRACT_ABI = [
           { "internalType": "uint64", "name": "totalPausedTime", "type": "uint64" },
           { "internalType": "uint64", "name": "longestStreak", "type": "uint64" },
           { "internalType": "uint32", "name": "totalResets", "type": "uint32" },
-          { "internalType": "bool", "name": "active", "type": "bool" }
+          { "internalType": "bool", "name": "active", "type": "bool" },
+          { "internalType": "string", "name": "category", "type": "string" },
+          { "internalType": "string", "name": "color", "type": "string" }
         ],
-        "internalType": "struct DaysSinceQuitV3.Counter[]",
+        "internalType": "struct DaysSinceQuitV4.Counter[]",
         "name": "counterData",
         "type": "tuple[]"
       }
@@ -110,9 +125,11 @@ export const CONTRACT_ABI = [
           { "internalType": "uint64", "name": "totalPausedTime", "type": "uint64" },
           { "internalType": "uint64", "name": "longestStreak", "type": "uint64" },
           { "internalType": "uint32", "name": "totalResets", "type": "uint32" },
-          { "internalType": "bool", "name": "active", "type": "bool" }
+          { "internalType": "bool", "name": "active", "type": "bool" },
+          { "internalType": "string", "name": "category", "type": "string" },
+          { "internalType": "string", "name": "color", "type": "string" }
         ],
-        "internalType": "struct DaysSinceQuitV3.Counter",
+        "internalType": "struct DaysSinceQuitV4.Counter",
         "name": "",
         "type": "tuple"
       }
@@ -162,9 +179,23 @@ export const CONTRACT_ABI = [
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      { "internalType": "string", "name": "category", "type": "string" },
+      { "internalType": "string", "name": "color", "type": "string" }
+    ],
     "name": "startCounter",
     "outputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "string", "name": "category", "type": "string" },
+      { "internalType": "string", "name": "color", "type": "string" }
+    ],
+    "name": "updateMetadata",
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   }

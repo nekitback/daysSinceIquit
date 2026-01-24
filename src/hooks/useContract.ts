@@ -7,12 +7,13 @@ import { useAccount } from 'wagmi'
 export function useStartCounter() {
   const { writeContract, data: hash, isPending, error } = useWriteContract()
 
-  const startCounter = async () => {
+  const startCounter = async (category: string, color: string) => {
     try {
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CONTRACT_ABI,
         functionName: 'startCounter',
+        args: [category, color],
       })
     } catch (err) {
       console.error('Error starting counter:', err)
@@ -25,6 +26,36 @@ export function useStartCounter() {
 
   return {
     startCounter,
+    isPending,
+    isConfirming,
+    isSuccess,
+    error,
+    hash,
+  }
+}
+
+export function useUpdateMetadata() {
+  const { writeContract, data: hash, isPending, error } = useWriteContract()
+
+  const updateMetadata = async (id: number, category: string, color: string) => {
+    try {
+      await writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'updateMetadata',
+        args: [BigInt(id), category, color],
+      })
+    } catch (err) {
+      console.error('Error updating metadata:', err)
+    }
+  }
+
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  })
+
+  return {
+    updateMetadata,
     isPending,
     isConfirming,
     isSuccess,
