@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Heart, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
+import { useAccount } from 'wagmi' 
 
 declare global {
     interface Window {
@@ -15,6 +16,7 @@ interface Props {
 
 export default function DonationModal({ isOpen, onClose }: Props) {
   const [copied, setCopied] = useState(false)
+  const { address } = useAccount()
   const donationAddress = '0x0648a08c0542d70fd7f8378a9cc2857055bfb3fb' 
 
   const copyAddress = () => {
