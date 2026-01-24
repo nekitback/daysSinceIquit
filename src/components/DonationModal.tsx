@@ -2,6 +2,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Heart, Copy, Check } from 'lucide-react'
 import { useState } from 'react'
 
+declare global {
+    interface Window {
+      ethereum?: any
+    }
+  }
+
 interface Props {
   isOpen: boolean
   onClose: () => void
@@ -18,11 +24,26 @@ export default function DonationModal({ isOpen, onClose }: Props) {
   }
 
   const handleDonate = (amount: string) => {
-    const ethAmount = parseFloat(amount).toFixed(4)
-    window.open(
-      `https://metamask.app.link/send/${donationAddress}@84532?value=${ethAmount}e18`,
-      '_blank'
-    )
+    const ethAmount = parseFloat(amount)
+    const weiAmount = Math.floor(ethAmount * 1e18).toString()
+    
+    if (window.ethereum) {
+      window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [{
+          from: window.ethereum.selectedAddress,
+          to: donationAddress,
+          value: '0x' + parseInt(weiAmount).toString(16), // Wei в hex
+        }],
+      }).catch((error: any) => {
+        console.error('Transaction error:', error)
+      })
+    } else {
+      window.open(
+        `https://metamask.app.link/send/${donationAddress}@84532?value=${weiAmount}`,
+        '_blank'
+      )
+    }
   }
 
   return (
