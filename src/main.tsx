@@ -5,18 +5,47 @@ import './index.css'
 import App from './App'
 
 import { 
-  getDefaultConfig, 
   RainbowKitProvider,
+  connectorsForWallets,
 } from '@rainbow-me/rainbowkit'
-import { WagmiProvider } from 'wagmi'
+import { 
+  coinbaseWallet,
+  metaMaskWallet,
+  walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets'
+import { WagmiProvider, createConfig, http } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
-const config = getDefaultConfig({
-  appName: 'Days Since I Quit',
-  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '72248be74feba112a1293cb62a84618b',
+// Настройка коннекторов с приоритетом Coinbase Wallet (Base App)
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Recommended for Base',
+      wallets: [
+        coinbaseWallet,  // ← ПЕРВЫМ! Для Base App
+        metaMaskWallet,
+      ],
+    },
+    {
+      groupName: 'Other',
+      wallets: [
+        walletConnectWallet,
+      ],
+    },
+  ],
+  {
+    appName: 'Days Since I Quit',
+    projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '72248be74feba112a1293cb62a84618b',
+  }
+)
+
+const config = createConfig({
+  connectors,
   chains: [baseSepolia],
-  ssr: false,
+  transports: {
+    [baseSepolia.id]: http(),
+  },
 })
 
 const queryClient = new QueryClient()
