@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { useStore } from '@/store/useStore'
-import { useCountersCount, useGetCounter } from './useContract'
+import { useCountersCount } from './useContract'
 
 export function useCounters() {
   const { address } = useAccount()
