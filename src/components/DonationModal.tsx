@@ -23,26 +23,38 @@ export default function DonationModal({ isOpen, onClose }: Props) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handleDonate = (amount: string) => {
-    const ethAmount = parseFloat(amount)
-    const weiAmount = Math.floor(ethAmount * 1e18).toString()
-    
-    if (window.ethereum) {
-      window.ethereum.request({
+  const handleDonate = async (amount: string) => {
+    try {
+      if (!window.ethereum) {
+        alert('Please connect your wallet first')
+        return
+      }
+  
+      // Конвертируем ETH в Wei
+      const ethAmount = parseFloat(amount)
+      const weiAmount = BigInt(Math.floor(ethAmount * 1e18))
+      
+      // Отправляем транзакцию
+      const tx = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [{
           from: window.ethereum.selectedAddress,
           to: donationAddress,
-          value: '0x' + parseInt(weiAmount).toString(16), // Wei в hex
+          value: '0x' + weiAmount.toString(16),
         }],
-      }).catch((error: any) => {
-        console.error('Transaction error:', error)
       })
-    } else {
-      window.open(
-        `https://metamask.app.link/send/${donationAddress}@84532?value=${weiAmount}`,
-        '_blank'
-      )
+      
+      console.log('Transaction sent:', tx)
+      alert('Thank you for your donation! 🙏')
+      onClose()
+      
+    } catch (error: any) {
+      console.error('Donation error:', error)
+      if (error.code === 4001) {
+        alert('Transaction cancelled')
+      } else {
+        alert('Transaction failed. Please try again.')
+      }
     }
   }
 

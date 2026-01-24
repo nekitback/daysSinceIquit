@@ -4,7 +4,6 @@ import '@rainbow-me/rainbowkit/styles.css'  // ← ПЕРВЫМ
 import './index.css'  // ← ВТОРЫМ (чтобы Tailwind был поверх)
 import App from './App'
 
-// Остальное без изменений
 import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
@@ -23,7 +22,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider 
+          modalSize="compact"
+          showRecentTransactions={true}
+        >
           <App />
         </RainbowKitProvider>
       </QueryClientProvider>
