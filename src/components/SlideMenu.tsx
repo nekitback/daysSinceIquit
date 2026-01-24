@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { formatAddress } from '../utils/formatAddress'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Info, Settings, LogOut, Heart, AlertCircle } from 'lucide-react'
+import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle } from 'lucide-react'
 import DonationModal from './DonationModal'
+import AboutModal from './AboutModal'
 
 interface Props {
   isOpen: boolean
@@ -14,6 +15,9 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
   const { address } = useAccount()
   const { disconnect } = useDisconnect()
   const [showDonation, setShowDonation] = useState(false)
+  const [showAbout, setShowAbout] = useState(false)
+
+  const baseProfileUrl = 'https://base.app/profile/0x585207f9B4C1FB59c5FC819411E0aCC60BdfFe69'
 
   return (
     <>
@@ -51,27 +55,65 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
               </div>
 
               <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors">
+                {/* About Button */}
+                <button
+                  onClick={() => {
+                    setShowAbout(true)
+                    onClose()
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors"
+                >
                   <Info className="w-5 h-5 text-gray-600" />
                   <span className="font-medium text-gray-900">About</span>
                 </button>
                 
-                <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors">
-                  <Settings className="w-5 h-5 text-gray-600" />
-                  <span className="font-medium text-gray-900">Settings</span>
-                </button>
-
-                {/* Support Button */}
+                {/* Settings Button - TODO: Add functionality later */}
                 <button
                   onClick={() => {
-                    setShowDonation(true)
+                    // TODO: Add settings modal in next phase
                     onClose()
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl transition-all group"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors opacity-50 cursor-not-allowed"
+                  disabled
                 >
-                  <Heart className="w-5 h-5 text-pink-600 group-hover:scale-110 transition-transform" />
-                  <span className="font-semibold text-pink-700">Support the Project</span>
+                  <Settings className="w-5 h-5 text-gray-600" />
+                  <span className="font-medium text-gray-900">Settings</span>
+                  <span className="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
                 </button>
+
+                {/* Support Section */}
+                <div className="pt-4 mt-4 border-t border-gray-200">
+                  <p className="text-xs font-semibold text-gray-500 mb-3 px-4">SUPPORT</p>
+                  
+                  {/* Donate Button */}
+                  <button
+                    onClick={() => {
+                      setShowDonation(true)
+                      onClose()
+                    }}
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl transition-all group"
+                  >
+                    <Heart className="w-5 h-5 text-pink-600 group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-pink-700">Support the Project</span>
+                  </button>
+
+                  {/* Contact on Base */}
+                  <a
+                    href={baseProfileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full flex items-center gap-3 px-4 py-3 mt-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition-all group"
+                  >
+                    <MessageCircle className="w-5 h-5 text-blue-600" />
+                    <div className="flex-1 text-left">
+                      <div className="font-semibold text-blue-700 flex items-center gap-1">
+                        Contact me on Base
+                        <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                      </div>
+                      <p className="text-xs text-blue-600">nba0x.base.eth</p>
+                    </div>
+                  </a>
+                </div>
 
                 {/* Medical Disclaimer */}
                 <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
@@ -111,8 +153,9 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Donation Modal */}
+      {/* Modals */}
       <DonationModal isOpen={showDonation} onClose={() => setShowDonation(false)} />
+      <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
     </>
   )
 }

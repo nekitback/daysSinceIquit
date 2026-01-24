@@ -1,14 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAccount, useWatchContractEvent } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Menu } from 'lucide-react'
+import PendingCounterCard from './components/PendingCounterCard'
 import CounterCard from './components/CounterCard'
 import ColorPicker from './components/ColorPicker'
 import CategorySelector from './components/CategorySelector'
 import SlideMenu from './components/SlideMenu'
+import CustomStartDate from './components/CustomStartDate'
+import ConfirmModal from './components/ConfirmModal'
+import Toast from './components/Toast'
+import Logo from './components/Logo'
+import Footer from './components/Footer'
 import { 
   useStartCounter, 
   useResetCounter, 
+  useStartCounterWithCustomTime,
   usePauseCounter,
   useResumeCounter,
   useDeleteCounter,
@@ -31,6 +38,12 @@ function App() {
 
   // Contract hooks
   const { startCounter, isPending, isConfirming, isSuccess } = useStartCounter()
+  const { 
+    startCounterWithCustomTime, 
+    isPending: isPendingCustom, 
+    isConfirming: isConfirmingCustom,
+    isSuccess: isSuccessCustom
+  } = useStartCounterWithCustomTime()
   const { resetCounter } = useResetCounter()
   const { pauseCounter } = usePauseCounter()
   const { resumeCounter } = useResumeCounter()
@@ -40,8 +53,62 @@ function App() {
   // Local state
   const [displayCounters, setDisplayCounters] = useState<Counter[]>([])
   const [loadingCounters, setLoadingCounters] = useState<Set<number>>(new Set())
+  const [customStartDate, setCustomStartDate] = useState<number | null>(null)
 
-  // Load counters from contract (metadata now comes from blockchain!)
+  // ✅ useRef для хранения timeout ID - предотвращает утечки
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Modal states
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean
+    title: string
+    message: string
+    onConfirm: () => void
+    confirmColor?: 'red' | 'blue' | 'green'
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  })
+
+  // Toast states
+  const [toast, setToast] = useState<{
+    isOpen: boolean
+    message: string
+    type: 'success' | 'error' | 'info'
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success',
+  })
+
+  const [pendingCounter, setPendingCounter] = useState<{
+    category: string
+    color: string
+    customStartDate: number | null
+  } | null>(null)
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToast({ isOpen: true, message, type })
+  }
+
+  // ✅ Функция для очистки timeout
+  const clearPendingTimeout = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+  }
+
+  // ✅ Cleanup при unmount
+  useEffect(() => {
+    return () => {
+      clearPendingTimeout()
+    }
+  }, [])
+
+  // Load counters from contract
   useEffect(() => {
     if (!activeCounters || !address) return
 
@@ -58,21 +125,38 @@ function App() {
         longestStreak: Number(onchainData.longestStreak),
         totalResets: Number(onchainData.totalResets),
         active: onchainData.active,
-        category: onchainData.category,      // ← From blockchain!
-        color: onchainData.color,            // ← From blockchain!
+        category: onchainData.category,
+        color: onchainData.color,
       }
     })
 
     setDisplayCounters(merged)
   }, [activeCounters, address])
 
-  // Auto-reload on contract events
+  // ✅ Сброс состояния при disconnect
+  useEffect(() => {
+    if (!isConnected) {
+      setPendingCounter(null)
+      setCustomStartDate(null)
+      setDisplayCounters([])
+      setLoadingCounters(new Set())
+      clearPendingTimeout()
+    }
+  }, [isConnected])
+
+  // ✅ ИСПРАВЛЕНО: Event listeners с проверкой адреса и без setTimeout
   useWatchContractEvent({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     eventName: 'CounterStarted',
-    onLogs() {
-      setTimeout(() => refetch(), 1000)
+    onLogs(logs) {
+      const eventUser = logs[0]?.args?.user
+      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
+        clearPendingTimeout()
+        setPendingCounter(null)
+        refetch()
+        showToast('✅ Counter created onchain!', 'success')
+      }
     },
   })
 
@@ -81,15 +165,17 @@ function App() {
     abi: CONTRACT_ABI,
     eventName: 'CounterPaused',
     onLogs(logs) {
-      setTimeout(() => {
-        refetch()
-        const id = Number(logs[0].args.id)
+      const eventUser = logs[0]?.args?.user
+      const id = Number(logs[0]?.args?.id)
+      
+      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
         setLoadingCounters(prev => {
           const newSet = new Set(prev)
           newSet.delete(id)
           return newSet
         })
-      }, 500)
+        refetch()
+      }
     },
   })
 
@@ -98,15 +184,17 @@ function App() {
     abi: CONTRACT_ABI,
     eventName: 'CounterResumed',
     onLogs(logs) {
-      setTimeout(() => {
-        refetch()
-        const id = Number(logs[0].args.id)
+      const eventUser = logs[0]?.args?.user
+      const id = Number(logs[0]?.args?.id)
+      
+      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
         setLoadingCounters(prev => {
           const newSet = new Set(prev)
           newSet.delete(id)
           return newSet
         })
-      }, 500)
+        refetch()
+      }
     },
   })
 
@@ -115,15 +203,17 @@ function App() {
     abi: CONTRACT_ABI,
     eventName: 'CounterReset',
     onLogs(logs) {
-      setTimeout(() => {
-        refetch()
-        const id = Number(logs[0].args.id)
+      const eventUser = logs[0]?.args?.user
+      const id = Number(logs[0]?.args?.id)
+      
+      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
         setLoadingCounters(prev => {
           const newSet = new Set(prev)
           newSet.delete(id)
           return newSet
         })
-      }, 500)
+        refetch()
+      }
     },
   })
 
@@ -132,21 +222,29 @@ function App() {
     abi: CONTRACT_ABI,
     eventName: 'CounterDeleted',
     onLogs(logs) {
-      setTimeout(() => {
-        refetch()
-        const id = Number(logs[0].args.id)
+      const eventUser = logs[0]?.args?.user
+      const id = Number(logs[0]?.args?.id)
+      
+      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
         setLoadingCounters(prev => {
           const newSet = new Set(prev)
           newSet.delete(id)
           return newSet
         })
-      }, 500)
+        refetch()
+      }
     },
   })
 
+  // ✅ ПОЛНОСТЬЮ ПЕРЕПИСАН handleQuit
   const handleQuit = async () => {
+    if (pendingCounter !== null) {
+      showToast('⏳ Please wait for current transaction', 'info')
+      return
+    }
+
     if (selectedCategory === 'custom' && !customName.trim()) {
-      alert('Please enter a custom habit name')
+      showToast('Please enter a custom habit name', 'error')
       return
     }
 
@@ -155,77 +253,138 @@ function App() {
       ? customName 
       : category?.label.replace(/[🚬🍺🍰📱🎮✏️]/g, '').trim() || 'Unknown'
 
-    // Now category and color go to the blockchain!
-    await startCounter(categoryName, selectedColor)
+    try {
+      // Вызываем контракт СНАЧАЛА (чтобы catch сработал при отмене)
+      let txPromise: Promise<any>
+      
+      if (customStartDate) {
+        txPromise = startCounterWithCustomTime(categoryName, selectedColor, customStartDate)
+      } else {
+        txPromise = startCounter(categoryName, selectedColor)
+      }
+
+      // Только ПОСЛЕ успешной отправки показываем фантом
+      await txPromise
+      
+      // Транзакция отправлена успешно!
+      setPendingCounter({
+        category: categoryName,
+        color: selectedColor,
+        customStartDate: customStartDate
+      })
+
+      // Таймаут на случай если event не сработает
+      clearPendingTimeout()
+      timeoutRef.current = setTimeout(() => {
+        console.warn('Transaction timeout')
+        setPendingCounter(null)
+        refetch() // Попытка обновить на всякий случай
+        showToast('⚠️ Taking longer than expected. Refreshing...', 'info')
+      }, 30000) // 30 секунд
+
+      setCustomStartDate(null)
+
+    } catch (error: any) {
+      console.error('Transaction error:', error)
+      
+      // Очищаем все
+      clearPendingTimeout()
+      setPendingCounter(null)
+      
+      // Обработка ошибок
+      if (error.code === 4001 || error.message?.includes('User rejected')) {
+        showToast('Transaction cancelled', 'info')
+      } else if (error.message?.includes('insufficient funds')) {
+        showToast('❌ Insufficient funds', 'error')
+      } else {
+        showToast('❌ Transaction failed', 'error')
+      }
+    }
   }
 
+  // ✅ УПРОЩЕННЫЕ обработчики операций
   const handleReset = async (id: number) => {
-    if (confirm('Are you sure you want to reset this counter? Your current streak will be saved if it\'s your longest!')) {
-      setLoadingCounters(prev => new Set(prev).add(id))
-      await resetCounter(id)
-      
-      // Fallback timeout
-      setTimeout(() => {
-        setLoadingCounters(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-        refetch()
-      }, 10000)
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Reset Counter?',
+      message: "Are you sure? Your current streak will be saved if it's your longest!",
+      confirmColor: 'red',
+      onConfirm: async () => {
+        try {
+          setLoadingCounters(prev => new Set(prev).add(id))
+          await resetCounter(id)
+          // Event listener уберет loading и обновит данные
+        } catch (error) {
+          setLoadingCounters(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(id)
+            return newSet
+          })
+          showToast('❌ Reset failed', 'error')
+        }
+      },
+    })
   }
 
   const handlePause = async (id: number) => {
-    setLoadingCounters(prev => new Set(prev).add(id))
-    await pauseCounter(id)
-    
-    setTimeout(() => {
+    try {
+      setLoadingCounters(prev => new Set(prev).add(id))
+      await pauseCounter(id)
+      // Event listener уберет loading
+    } catch (error) {
       setLoadingCounters(prev => {
         const newSet = new Set(prev)
         newSet.delete(id)
         return newSet
       })
-      refetch()
-    }, 10000)
+      showToast('❌ Pause failed', 'error')
+    }
   }
 
   const handleResume = async (id: number) => {
-    setLoadingCounters(prev => new Set(prev).add(id))
-    await resumeCounter(id)
-    
-    setTimeout(() => {
+    try {
+      setLoadingCounters(prev => new Set(prev).add(id))
+      await resumeCounter(id)
+      // Event listener уберет loading
+    } catch (error) {
       setLoadingCounters(prev => {
         const newSet = new Set(prev)
         newSet.delete(id)
         return newSet
       })
-      refetch()
-    }, 10000)
+      showToast('❌ Resume failed', 'error')
+    }
   }
 
   const handleDelete = async (id: number) => {
-    if (confirm('Are you sure you want to permanently delete this counter?')) {
-      setLoadingCounters(prev => new Set(prev).add(id))
-      await deleteCounter(id)
-      
-      setTimeout(() => {
-        setLoadingCounters(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-        refetch()
-      }, 10000)
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Counter?',
+      message: 'Permanently delete this counter? This cannot be undone.',
+      confirmColor: 'red',
+      onConfirm: async () => {
+        try {
+          setLoadingCounters(prev => new Set(prev).add(id))
+          await deleteCounter(id)
+          // Event listener уберет loading и обновит
+        } catch (error) {
+          setLoadingCounters(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(id)
+            return newSet
+          })
+          showToast('❌ Delete failed', 'error')
+        }
+      },
+    })
   }
 
   if (!isConnected) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="w-20 h-20 mx-auto mb-8 bg-blue-600 rounded-2xl flex items-center justify-center shadow-2xl">
-            <div className="w-12 h-12 border-4 border-white rounded-lg"></div>
+        <div className="text-center max-w-md w-full">
+          <div className="flex justify-center mb-8">
+            <Logo size="large" showText={false} />
           </div>
           
           <h1 className="text-5xl font-bold text-white mb-3">
@@ -236,7 +395,9 @@ function App() {
             Built on <span className="text-blue-500 font-semibold">Base</span>.
           </p>
           
-          <ConnectButton />
+          <div className="flex justify-center">
+            <ConnectButton />
+          </div>
           
           <p className="text-gray-600 text-sm mt-6">
             Powered by Base Sepolia
@@ -248,7 +409,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -260,15 +420,7 @@ function App() {
                 <Menu className="w-6 h-6 text-gray-700" />
               </button>
               
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-white rounded"></div>
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">Days Since I Quit</h1>
-                  <p className="text-xs text-gray-500">Track onchain</p>
-                </div>
-              </div>
+              <Logo size="small" showText={true} />
             </div>
 
             <ConnectButton />
@@ -282,7 +434,21 @@ function App() {
         <div className="max-w-4xl mx-auto space-y-8">
           
           {/* Create Counter Card */}
-          <section className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+          <section 
+            className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transition-all ${
+              pendingCounter ? 'opacity-50 pointer-events-none' : ''
+            }`}
+          >
+            {pendingCounter && (
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
+                <div className="text-center">
+                  <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-lg font-semibold text-gray-900">Creating counter...</p>
+                  <p className="text-sm text-gray-600 mt-1">Waiting for confirmation</p>
+                </div>
+              </div>
+            )}
+            
             <div 
               className="px-8 py-6 transition-colors duration-300"
               style={{ 
@@ -300,21 +466,31 @@ function App() {
             <div className="p-8 space-y-6">
               <ColorPicker />
               <CategorySelector />
+              <CustomStartDate 
+                selectedDate={customStartDate}
+                onDateChange={setCustomStartDate}
+              />
               
               <button
                 onClick={handleQuit}
-                disabled={isPending || isConfirming}
+                disabled={
+                  isPending || 
+                  isConfirming || 
+                  isPendingCustom ||
+                  isConfirmingCustom ||
+                  pendingCounter !== null
+                }
                 className="w-full px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
                 style={{
                   background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
                 }}
               >
-                {isPending ? (
+                {(isPending || isPendingCustom) ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Confirm in wallet...</span>
                   </div>
-                ) : isConfirming ? (
+                ) : (isConfirming || isConfirmingCustom || pendingCounter) ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Processing...</span>
@@ -323,13 +499,6 @@ function App() {
                   'I Quit! 🚀'
                 )}
               </button>
-
-              {isSuccess && (
-                <div className="p-4 bg-green-50 border border-green-200 text-green-800 rounded-xl">
-                  <p className="font-semibold">✅ Counter created onchain!</p>
-                  <p className="text-xs mt-1">Category and color stored in blockchain</p>
-                </div>
-              )}
             </div>
           </section>
 
@@ -338,16 +507,24 @@ function App() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                 Your Counters
-                {displayCounters.length > 0 && (
+                {(displayCounters.length > 0 || pendingCounter) && (
                   <span className="text-base px-3 py-1 bg-blue-100 text-blue-600 rounded-full font-semibold">
-                    {displayCounters.length}
+                    {displayCounters.length + (pendingCounter ? 1 : 0)}
                   </span>
                 )}
               </h2>
             </div>
             
-            {displayCounters.length > 0 ? (
+            {(displayCounters.length > 0 || pendingCounter) ? (
               <div className="grid gap-6">
+                {pendingCounter && (
+                  <PendingCounterCard
+                    category={pendingCounter.category}
+                    color={pendingCounter.color}
+                    customStartDate={pendingCounter.customStartDate}
+                  />
+                )}
+                
                 {displayCounters.map((counter) => (
                   <CounterCard 
                     key={counter.id} 
@@ -377,42 +554,23 @@ function App() {
         </div>
       </main>
 
-      {/* Footer with Disclaimer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Medical Disclaimer */}
-          <div className="max-w-4xl mx-auto mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-            <div className="flex items-start gap-3">
-              <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white text-xs font-bold">!</span>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm font-bold text-yellow-900 mb-1">
-                  Medical Disclaimer
-                </h3>
-                <p className="text-sm text-yellow-800 leading-relaxed">
-                  This application is designed for tracking and motivational purposes only. 
-                  It does not provide medical advice, diagnosis, or treatment. If you are 
-                  struggling with addiction or substance abuse, please consult qualified 
-                  healthcare professionals or contact a treatment center. This app is not 
-                  a substitute for professional medical care.
-                </p>
-              </div>
-            </div>
-          </div>
+      <Footer />
 
-          {/* Footer Info */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-600">
-            <p>
-              Built on <span className="font-semibold text-blue-600">Base</span> • 
-              Contract: {CONTRACT_ADDRESS.slice(0, 6)}...{CONTRACT_ADDRESS.slice(-4)}
-            </p>
-            <p>
-              Made with ❤️ for the Base ecosystem
-            </p>
-          </div>
-        </div>
-      </footer>
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmColor={confirmModal.confirmColor}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+      />
+
+      <Toast
+        isOpen={toast.isOpen}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isOpen: false })}
+      />
     </div>
   )
 }

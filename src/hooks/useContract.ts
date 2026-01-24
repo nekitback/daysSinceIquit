@@ -152,6 +152,40 @@ export function useResumeCounter() {
   }
 }
 
+/**
+ * Hook for starting a counter with custom start time
+ */
+export function useStartCounterWithCustomTime() {
+  const { writeContractAsync, isPending, isConfirming, isSuccess, ...rest } = useWriteContract()
+
+  const startCounterWithCustomTime = async (
+    category: string, 
+    color: string,
+    customStartTime: number
+  ) => {
+    try {
+      const tx = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'startCounterWithCustomTime',
+        args: [category, color, BigInt(customStartTime)],
+      })
+      return tx
+    } catch (error) {
+      console.error('Error starting counter with custom time:', error)
+      throw error
+    }
+  }
+
+  return { 
+    startCounterWithCustomTime, 
+    isPending, 
+    isConfirming, 
+    isSuccess,
+    ...rest 
+  }
+}
+
 export function useDeleteCounter() {
   const { writeContract, data: hash, isPending, error } = useWriteContract()
 

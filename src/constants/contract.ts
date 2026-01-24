@@ -1,202 +1,205 @@
-export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xf4a1037F03aE7586213Cd0F03C50457fE156946d') as `0x${string}`
+export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xF6016fCb6653e4D351b976c0574C0359d5D209f4') as `0x${string}`
 
 export const CONTRACT_ABI = [
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" }
+    type: 'function',
+    name: 'startCounter',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'category', type: 'string' },
+      { name: 'color', type: 'string' }
     ],
-    "name": "CounterDeleted",
-    "type": "event"
+    outputs: [{ name: '', type: 'uint256' }]
   },
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "pausedAt", "type": "uint64" }
+    type: 'function',
+    name: 'startCounterWithCustomTime',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'category', type: 'string' },
+      { name: 'color', type: 'string' },
+      { name: 'customStartTime', type: 'uint64' }
     ],
-    "name": "CounterPaused",
-    "type": "event"
+    outputs: [{ name: '', type: 'uint256' }]
   },
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "currentStreak", "type": "uint64" }
+    type: 'function',
+    name: 'pauseCounter',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'id', type: 'uint256' }],
+    outputs: []
+  },
+  {
+    type: 'function',
+    name: 'resumeCounter',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'id', type: 'uint256' }],
+    outputs: []
+  },
+  {
+    type: 'function',
+    name: 'resetCounter',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'id', type: 'uint256' }],
+    outputs: []
+  },
+  {
+    type: 'function',
+    name: 'deleteCounter',
+    stateMutability: 'nonpayable',
+    inputs: [{ name: 'id', type: 'uint256' }],
+    outputs: []
+  },
+  {
+    type: 'function',
+    name: 'updateMetadata',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'id', type: 'uint256' },
+      { name: 'category', type: 'string' },
+      { name: 'color', type: 'string' }
     ],
-    "name": "CounterReset",
-    "type": "event"
+    outputs: []
   },
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "pausedDuration", "type": "uint64" }
+    type: 'function',
+    name: 'getCurrentStreak',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'id', type: 'uint256' }
     ],
-    "name": "CounterResumed",
-    "type": "event"
+    outputs: [{ name: '', type: 'uint64' }]
   },
   {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "startedAt", "type": "uint64" },
-      { "indexed": false, "internalType": "string", "name": "category", "type": "string" },
-      { "indexed": false, "internalType": "string", "name": "color", "type": "string" }
+    type: 'function',
+    name: 'getCounter',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'id', type: 'uint256' }
     ],
-    "name": "CounterStarted",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "string", "name": "category", "type": "string" },
-      { "indexed": false, "internalType": "string", "name": "color", "type": "string" }
-    ],
-    "name": "MetadataUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": false, "internalType": "uint64", "name": "longestStreak", "type": "uint64" }
-    ],
-    "name": "NewStreakRecord",
-    "type": "event"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "name": "countersCount",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
-    "name": "deleteCounter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "address", "name": "user", "type": "address" }],
-    "name": "getActiveCounters",
-    "outputs": [
-      { "internalType": "uint256[]", "name": "ids", "type": "uint256[]" },
+    outputs: [
       {
-        "components": [
-          { "internalType": "uint64", "name": "startedAt", "type": "uint64" },
-          { "internalType": "uint64", "name": "pausedAt", "type": "uint64" },
-          { "internalType": "uint64", "name": "totalPausedTime", "type": "uint64" },
-          { "internalType": "uint64", "name": "longestStreak", "type": "uint64" },
-          { "internalType": "uint32", "name": "totalResets", "type": "uint32" },
-          { "internalType": "bool", "name": "active", "type": "bool" },
-          { "internalType": "string", "name": "category", "type": "string" },
-          { "internalType": "string", "name": "color", "type": "string" }
-        ],
-        "internalType": "struct DaysSinceQuitV4.Counter[]",
-        "name": "counterData",
-        "type": "tuple[]"
+        name: '',
+        type: 'tuple',
+        components: [
+          { name: 'startedAt', type: 'uint64' },
+          { name: 'pausedAt', type: 'uint64' },
+          { name: 'totalPausedTime', type: 'uint64' },
+          { name: 'longestStreak', type: 'uint64' },
+          { name: 'totalResets', type: 'uint32' },
+          { name: 'active', type: 'bool' },
+          { name: 'category', type: 'string' },
+          { name: 'color', type: 'string' }
+        ]
       }
-    ],
-    "stateMutability": "view",
-    "type": "function"
+    ]
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" },
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "getCounter",
-    "outputs": [
+    type: 'function',
+    name: 'getActiveCounters',
+    stateMutability: 'view',
+    inputs: [{ name: 'user', type: 'address' }],
+    outputs: [
+      { name: '', type: 'uint256[]' },
       {
-        "components": [
-          { "internalType": "uint64", "name": "startedAt", "type": "uint64" },
-          { "internalType": "uint64", "name": "pausedAt", "type": "uint64" },
-          { "internalType": "uint64", "name": "totalPausedTime", "type": "uint64" },
-          { "internalType": "uint64", "name": "longestStreak", "type": "uint64" },
-          { "internalType": "uint32", "name": "totalResets", "type": "uint32" },
-          { "internalType": "bool", "name": "active", "type": "bool" },
-          { "internalType": "string", "name": "category", "type": "string" },
-          { "internalType": "string", "name": "color", "type": "string" }
-        ],
-        "internalType": "struct DaysSinceQuitV4.Counter",
-        "name": "",
-        "type": "tuple"
+        name: '',
+        type: 'tuple[]',
+        components: [
+          { name: 'startedAt', type: 'uint64' },
+          { name: 'pausedAt', type: 'uint64' },
+          { name: 'totalPausedTime', type: 'uint64' },
+          { name: 'longestStreak', type: 'uint64' },
+          { name: 'totalResets', type: 'uint32' },
+          { name: 'active', type: 'bool' },
+          { name: 'category', type: 'string' },
+          { name: 'color', type: 'string' }
+        ]
       }
+    ]
+  },
+  {
+    type: 'function',
+    name: 'getRelapseHistory',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'user', type: 'address' },
+      { name: 'id', type: 'uint256' }
     ],
-    "stateMutability": "view",
-    "type": "function"
+    outputs: [{ name: '', type: 'uint64[]' }]
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" },
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "getCurrentStreak",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
+    type: 'function',
+    name: 'countersCount',
+    stateMutability: 'view',
+    inputs: [{ name: 'user', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }]
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "user", "type": "address" },
-      { "internalType": "uint256", "name": "id", "type": "uint256" }
-    ],
-    "name": "getRelapseHistory",
-    "outputs": [{ "internalType": "uint64[]", "name": "", "type": "uint64[]" }],
-    "stateMutability": "view",
-    "type": "function"
+    type: 'event',
+    name: 'CounterStarted',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true },
+      { name: 'startedAt', type: 'uint64', indexed: false },
+      { name: 'category', type: 'string', indexed: false },
+      { name: 'color', type: 'string', indexed: false }
+    ]
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
-    "name": "pauseCounter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    type: 'event',
+    name: 'CounterPaused',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true },
+      { name: 'pausedAt', type: 'uint64', indexed: false }
+    ]
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
-    "name": "resetCounter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    type: 'event',
+    name: 'CounterResumed',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true },
+      { name: 'resumedAt', type: 'uint64', indexed: false }
+    ]
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
-    "name": "resumeCounter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    type: 'event',
+    name: 'CounterReset',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true },
+      { name: 'resetAt', type: 'uint64', indexed: false },
+      { name: 'previousStreak', type: 'uint64', indexed: false }
+    ]
   },
   {
-    "inputs": [
-      { "internalType": "string", "name": "category", "type": "string" },
-      { "internalType": "string", "name": "color", "type": "string" }
-    ],
-    "name": "startCounter",
-    "outputs": [{ "internalType": "uint256", "name": "id", "type": "uint256" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    type: 'event',
+    name: 'CounterDeleted',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true }
+    ]
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "internalType": "string", "name": "category", "type": "string" },
-      { "internalType": "string", "name": "color", "type": "string" }
-    ],
-    "name": "updateMetadata",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    type: 'event',
+    name: 'MetadataUpdated',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true },
+      { name: 'category', type: 'string', indexed: false },
+      { name: 'color', type: 'string', indexed: false }
+    ]
+  },
+  {
+    type: 'event',
+    name: 'NewStreakRecord',
+    inputs: [
+      { name: 'user', type: 'address', indexed: true },
+      { name: 'id', type: 'uint256', indexed: true },
+      { name: 'newRecord', type: 'uint64', indexed: false }
+    ]
   }
 ] as const

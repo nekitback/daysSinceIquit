@@ -12,9 +12,10 @@ declare global {
 interface Props {
   isOpen: boolean
   onClose: () => void
+  onDonationSuccess?: (message: string) => void
 }
 
-export default function DonationModal({ isOpen, onClose }: Props) {
+export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Props) {
   const [copied, setCopied] = useState(false)
   const { address } = useAccount()
   const donationAddress = '0x0648a08c0542d70fd7f8378a9cc2857055bfb3fb' 
@@ -28,12 +29,16 @@ export default function DonationModal({ isOpen, onClose }: Props) {
   const handleDonate = async (amount: string) => {
     try {
       if (!address) {
-        alert('Please connect your wallet first')
+        if (onDonationSuccess) {
+          onDonationSuccess('⚠️ Please connect your wallet first')
+        }
         return
       }
   
       if (!window.ethereum) {
-        alert('Wallet not detected')
+        if (onDonationSuccess) {
+          onDonationSuccess('⚠️ Wallet not detected')
+        }
         return
       }
   
@@ -43,25 +48,35 @@ export default function DonationModal({ isOpen, onClose }: Props) {
       const tx = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [{
-          from: address,  // ← ВОТ ЭТА СТРОКА должна использовать address
+          from: address,
           to: donationAddress,
           value: '0x' + weiAmount.toString(16),
         }],
       })
       
       console.log('Transaction sent:', tx)
-      alert('Thank you for your donation! 🙏')
+      
+      // Show success toast
+      if (onDonationSuccess) {
+        onDonationSuccess('🙏 Thank you for your donation! Your support means everything!')
+      }
+      
       onClose()
       
     } catch (error: any) {
       console.error('Donation error:', error)
       if (error.code === 4001) {
-        alert('Transaction cancelled')
+        if (onDonationSuccess) {
+          onDonationSuccess('Transaction cancelled')
+        }
       } else {
-        alert('Transaction failed: ' + (error.message || 'Unknown error'))
+        if (onDonationSuccess) {
+          onDonationSuccess('❌ Transaction failed: ' + (error.message || 'Unknown error'))
+        }
       }
     }
   }
+
   return (
     <AnimatePresence>
       {isOpen && (
