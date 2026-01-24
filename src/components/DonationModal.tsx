@@ -27,20 +27,23 @@ export default function DonationModal({ isOpen, onClose }: Props) {
 
   const handleDonate = async (amount: string) => {
     try {
-      if (!window.ethereum) {
+      if (!address) {
         alert('Please connect your wallet first')
         return
       }
   
-      // Конвертируем ETH в Wei
+      if (!window.ethereum) {
+        alert('Wallet not detected')
+        return
+      }
+  
       const ethAmount = parseFloat(amount)
       const weiAmount = BigInt(Math.floor(ethAmount * 1e18))
       
-      // Отправляем транзакцию
       const tx = await window.ethereum.request({
         method: 'eth_sendTransaction',
         params: [{
-          from: window.ethereum.selectedAddress,
+          from: address,  // ← ВОТ ЭТА СТРОКА должна использовать address
           to: donationAddress,
           value: '0x' + weiAmount.toString(16),
         }],
@@ -55,11 +58,10 @@ export default function DonationModal({ isOpen, onClose }: Props) {
       if (error.code === 4001) {
         alert('Transaction cancelled')
       } else {
-        alert('Transaction failed. Please try again.')
+        alert('Transaction failed: ' + (error.message || 'Unknown error'))
       }
     }
   }
-
   return (
     <AnimatePresence>
       {isOpen && (
