@@ -29,7 +29,7 @@ function App() {
   } = useStore()
 
   // Contract hooks
-  const { startCounter, isPending, isConfirming, isSuccess, hash } = useStartCounter()
+  const { startCounter, isPending, isConfirming, isSuccess } = useStartCounter()
   const { resetCounter } = useResetCounter()
   const { pauseCounter } = usePauseCounter()
   const { resumeCounter } = useResumeCounter()
