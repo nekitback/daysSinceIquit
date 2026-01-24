@@ -156,7 +156,7 @@ export function useResumeCounter() {
  * Hook for starting a counter with custom start time
  */
 export function useStartCounterWithCustomTime() {
-  const { writeContractAsync, isPending, isConfirming, isSuccess, ...rest } = useWriteContract()
+  const { writeContractAsync, data: hash, isPending, error } = useWriteContract()
 
   const startCounterWithCustomTime = async (
     category: string, 
@@ -177,12 +177,17 @@ export function useStartCounterWithCustomTime() {
     }
   }
 
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+    hash,
+  })
+
   return { 
     startCounterWithCustomTime, 
     isPending, 
     isConfirming, 
     isSuccess,
-    ...rest 
+    error,
+    hash,
   }
 }
 
