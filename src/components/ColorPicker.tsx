@@ -33,7 +33,9 @@ export default function ColorPicker() {
               background: selectedColor === color.value 
                 ? `linear-gradient(135deg, ${color.value}, ${color.value}dd)`
                 : undefined,
-              ringColor: selectedColor === color.value ? color.value : undefined,
+              ...(selectedColor === color.value && {
+                '--tw-ring-color': color.value,
+              } as React.CSSProperties),
             }}
           >
             {selectedColor !== color.value && (

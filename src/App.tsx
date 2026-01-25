@@ -23,7 +23,6 @@ import {
   useGetActiveCounters 
 } from './hooks/useContract'
 import { PRESET_CATEGORIES } from './constants/categories'
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from './constants/contract'
 import { useStore } from './store/useStore'
 import type { Counter } from './types'
 
@@ -313,7 +312,7 @@ function App() {
         <PendingCounterCard
           category={tx.category!}
           color={tx.color!}
-          customStartDate={tx.customStartDate}
+          customStartDate={tx.customStartDate ?? null}
           txHash={tx.hash}
           status={isLoading ? 'pending' : isSuccess ? 'success' : isError ? 'error' : 'pending'}
         />
