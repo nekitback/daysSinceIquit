@@ -5,7 +5,7 @@ export default function Footer() {
   const baseProfileUrl = 'https://base.app/profile/0x585207f9B4C1FB59c5FC819411E0aCC60BdfFe69'
   
   return (
-    <footer className="bg-white border-t border-gray-200 mt-16">
+    <footer className="relative mt-16 bg-gray-900/80 backdrop-blur-md border-t border-gray-800">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Medical Disclaimer */}
         <div className="max-w-4xl mx-auto mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">

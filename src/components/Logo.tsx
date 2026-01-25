@@ -88,7 +88,7 @@ interface LogoProps {
         {/* Text (optional) */}
         {showText && (
           <div>
-            <h1 className={`${textSizes[size]} font-bold text-gray-900 leading-tight`}>
+            <h1 className={`${textSizes[size]} font-bold text-white leading-tight`}>
               Days Since I Quit
             </h1>
             <p className="text-xs text-gray-500">Track onchain</p>

@@ -12,6 +12,7 @@ import ConfirmModal from './components/ConfirmModal'
 import Toast from './components/Toast'
 import Logo from './components/Logo'
 import Footer from './components/Footer'
+import StarfieldBackground from './components/StarfieldBackground'
 import { 
   useStartCounter, 
   useResetCounter, 
@@ -120,16 +121,13 @@ function App() {
     }
   }, [isConnected])
 
-  // ✅ ПРОВЕРКА ДУБЛИКАТОВ
   const checkDuplicateCategory = (categoryName: string): boolean => {
     const normalizedNew = categoryName.toLowerCase().trim()
     
-    // Проверяем существующие счетчики
     const hasDuplicate = displayCounters.some(counter => 
       counter.category.toLowerCase().trim() === normalizedNew
     )
     
-    // Проверяем pending транзакции
     const hasPendingDuplicate = pendingTxs.some(tx => 
       tx.type === 'create' && tx.category?.toLowerCase().trim() === normalizedNew
     )
@@ -148,7 +146,6 @@ function App() {
       ? customName 
       : category?.label.replace(/[🚬🍺🍰📱🎮✏️]/g, '').trim() || 'Unknown'
 
-    // ✅ ПРОВЕРКА ДУБЛИКАТА
     if (checkDuplicateCategory(categoryName)) {
       showToast(`❌ You already have a "${categoryName}" counter`, 'error')
       return
@@ -327,19 +324,19 @@ function App() {
     if (!counter) return null
 
     return (
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center gap-4">
-        {isLoading && <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" />}
-        {isSuccess && <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />}
-        {isError && <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />}
+      <div className="bg-gray-800/50 backdrop-blur-sm border-2 border-gray-700 rounded-xl p-4 flex items-center gap-4">
+        {isLoading && <Loader2 className="w-5 h-5 text-blue-400 animate-spin flex-shrink-0" />}
+        {isSuccess && <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />}
+        {isError && <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />}
         
         <div className="flex-1">
-          <p className="font-semibold text-gray-900">
+          <p className="font-semibold text-white">
             {tx.type === 'pause' && 'Pausing counter...'}
             {tx.type === 'resume' && 'Resuming counter...'}
             {tx.type === 'reset' && 'Resetting counter...'}
             {tx.type === 'delete' && 'Deleting counter...'}
           </p>
-          <p className="text-sm text-gray-600 font-mono">
+          <p className="text-sm text-gray-400 font-mono">
             {counter.category}
           </p>
         </div>
@@ -348,7 +345,7 @@ function App() {
           href={`https://sepolia.basescan.org/tx/${tx.hash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium"
+          className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-sm font-medium"
         >
           View
           <ExternalLink className="w-4 h-4" />
@@ -359,8 +356,9 @@ function App() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center px-4">
-        <div className="text-center max-w-md w-full">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center px-4 relative overflow-hidden">
+        <StarfieldBackground />
+        <div className="text-center max-w-md w-full relative" style={{ zIndex: 10 }}>
           <div className="flex justify-center mb-8">
             <Logo size="large" showText={false} />
           </div>
@@ -389,150 +387,155 @@ function App() {
   const operationPendingTxs = pendingTxs.filter(tx => tx.type !== 'create')
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setMenuOpen(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Menu className="w-6 h-6 text-gray-700" />
-              </button>
-              
-              <Logo size="small" showText={true} />
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
+      <StarfieldBackground />
+      
+      <div className="relative" style={{ zIndex: 10 }}>
+        <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-30 shadow-lg">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setMenuOpen(true)}
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <Menu className="w-6 h-6 text-gray-300" />
+                </button>
+                
+                <Logo size="small" showText={true} />
+              </div>
 
-            <ConnectButton />
+              <ConnectButton />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <SlideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+        <SlideMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          
-          <section 
-            className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transition-all ${
-              createPendingTx ? 'opacity-50 pointer-events-none' : ''
-            }`}
-          >
-            <div 
-              className="px-8 py-6 transition-colors duration-300"
-              style={{ 
-                background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)` 
-              }}
-            >
-              <h2 className="text-2xl font-bold text-white drop-shadow-md">
-                Start a New Counter
-              </h2>
-              <p className="text-white/90 text-sm mt-1">
-                All data stored permanently onchain
-              </p>
-            </div>
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-4xl mx-auto space-y-8">
             
-            <div className="p-8 space-y-6">
-              <ColorPicker />
-              <CategorySelector />
-              <CustomStartDate 
-                selectedDate={customStartDate}
-                onDateChange={setCustomStartDate}
-              />
-              
-              <button
-                onClick={handleQuit}
-                disabled={
-                  isPending || 
-                  isConfirming || 
-                  isPendingCustom ||
-                  isConfirmingCustom ||
-                  createPendingTx !== undefined
-                }
-                className="w-full px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
-                style={{
-                  background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
+            <section 
+              className={`relative bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-800 overflow-hidden transition-all ${
+                createPendingTx ? 'opacity-50 pointer-events-none' : ''
+              }`}
+            >
+              <div 
+                className="px-8 py-6 transition-colors duration-300"
+                style={{ 
+                  background: `linear-gradient(to right, ${selectedColor}22, transparent)`,
+                  borderBottom: `2px solid ${selectedColor}44`
                 }}
               >
-                {(isPending || isPendingCustom) ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Confirm in wallet...</span>
-                  </div>
-                ) : (isConfirming || isConfirmingCustom || createPendingTx) ? (
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Processing...</span>
-                  </div>
-                ) : (
-                  'I Quit! 🚀'
-                )}
-              </button>
-            </div>
-          </section>
-
-          {operationPendingTxs.length > 0 && (
-            <section className="space-y-3">
-              <h3 className="text-lg font-semibold text-gray-900">Pending Transactions</h3>
-              {operationPendingTxs.map(tx => (
-                <PendingTransaction key={tx.hash} tx={tx} />
-              ))}
-            </section>
-          )}
-
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-                Your Counters
-                {(displayCounters.length > 0 || createPendingTx) && (
-                  <span className="text-base px-3 py-1 bg-blue-100 text-blue-600 rounded-full font-semibold">
-                    {displayCounters.length + (createPendingTx ? 1 : 0)}
-                  </span>
-                )}
-              </h2>
-            </div>
-            
-            {(displayCounters.length > 0 || createPendingTx) ? (
-              <div className="grid gap-6">
-                {createPendingTx && (
-                  <PendingTransaction tx={createPendingTx} />
-                )}
+                <h2 className="text-2xl font-bold text-white drop-shadow-lg">
+                  Start a New Counter
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                  All data stored permanently onchain
+                </p>
+              </div>
+              
+              <div className="p-8 space-y-6">
+                <ColorPicker />
+                <CategorySelector />
+                <CustomStartDate 
+                  selectedDate={customStartDate}
+                  onDateChange={setCustomStartDate}
+                />
                 
-                {displayCounters.map((counter) => {
-                  const hasPendingOp = operationPendingTxs.some(tx => tx.counterId === counter.id)
-                  
-                  return (
-                    <CounterCard 
-                      key={counter.id} 
-                      counter={counter}
-                      isLoading={hasPendingOp}
-                      onReset={handleReset}
-                      onPause={handlePause}
-                      onResume={handleResume}
-                      onDelete={handleDelete}
-                    />
-                  )
-                })}
+                <button
+                  onClick={handleQuit}
+                  disabled={
+                    isPending || 
+                    isConfirming || 
+                    isPendingCustom ||
+                    isConfirmingCustom ||
+                    createPendingTx !== undefined
+                  }
+                  className="w-full px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
+                  style={{
+                    background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
+                  }}
+                >
+                  {(isPending || isPendingCustom) ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Confirm in wallet...</span>
+                    </div>
+                  ) : (isConfirming || isConfirmingCustom || createPendingTx) ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Processing...</span>
+                    </div>
+                  ) : (
+                    'I Quit! 🚀'
+                  )}
+                </button>
               </div>
-            ) : (
-              <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                  <span className="text-3xl">🎯</span>
-                </div>
-                <p className="text-lg font-medium text-gray-700 mb-2">
-                  No counters yet
-                </p>
-                <p className="text-gray-500">
-                  Start your journey by creating your first counter!
-                </p>
-              </div>
-            )}
-          </section>
-        </div>
-      </main>
+            </section>
 
-      <Footer />
+            {operationPendingTxs.length > 0 && (
+              <section className="space-y-3">
+                <h3 className="text-lg font-semibold text-white">Pending Transactions</h3>
+                {operationPendingTxs.map(tx => (
+                  <PendingTransaction key={tx.hash} tx={tx} />
+                ))}
+              </section>
+            )}
+
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                  Your Counters
+                  {(displayCounters.length > 0 || createPendingTx) && (
+                    <span className="text-base px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full font-semibold border border-blue-500/30">
+                      {displayCounters.length + (createPendingTx ? 1 : 0)}
+                    </span>
+                  )}
+                </h2>
+              </div>
+              
+              {(displayCounters.length > 0 || createPendingTx) ? (
+                <div className="grid gap-6">
+                  {createPendingTx && (
+                    <PendingTransaction tx={createPendingTx} />
+                  )}
+                  
+                  {displayCounters.map((counter) => {
+                    const hasPendingOp = operationPendingTxs.some(tx => tx.counterId === counter.id)
+                    
+                    return (
+                      <CounterCard 
+                        key={counter.id} 
+                        counter={counter}
+                        isLoading={hasPendingOp}
+                        onReset={handleReset}
+                        onPause={handlePause}
+                        onResume={handleResume}
+                        onDelete={handleDelete}
+                      />
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-16 bg-gray-900/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-700">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center">
+                    <span className="text-3xl">🎯</span>
+                  </div>
+                  <p className="text-lg font-medium text-white mb-2">
+                    No counters yet
+                  </p>
+                  <p className="text-gray-400">
+                    Start your journey by creating your first counter!
+                  </p>
+                </div>
+              )}
+            </section>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}

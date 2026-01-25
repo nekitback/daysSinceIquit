@@ -48,26 +48,26 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
-              className="fixed inset-0 bg-black/40 z-40"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
             />
 
             <motion.div
               initial={{ x: -320 }}
               animate={{ x: 0 }}
               exit={{ x: -320 }}
-              className="fixed left-0 top-0 h-full w-80 bg-white z-50 shadow-2xl flex flex-col"
+              className="fixed left-0 top-0 h-full w-80 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 z-50 shadow-2xl flex flex-col border-r border-gray-700"
             >
-              <div className="p-6 border-b border-gray-200">
+              <div className="p-6 border-b border-gray-700">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-gray-900">Menu</h2>
-                  <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-                    <X className="w-5 h-5" />
+                  <h2 className="text-lg font-bold text-white">Menu</h2>
+                  <button onClick={onClose} className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
+                    <X className="w-5 h-5 text-gray-300" />
                   </button>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3">
-                  <p className="text-xs font-medium text-gray-600 mb-1">Wallet</p>
-                  <p className="text-sm font-mono font-bold text-blue-600">
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3">
+                  <p className="text-xs font-medium text-gray-400 mb-1">Wallet</p>
+                  <p className="text-sm font-mono font-bold text-blue-400">
                     {formatAddress(address || '')}
                   </p>
                 </div>
@@ -80,28 +80,27 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                     setShowAbout(true)
                     onClose()
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-xl transition-colors"
                 >
-                  <Info className="w-5 h-5 text-gray-600" />
-                  <span className="font-medium text-gray-900">About</span>
+                  <Info className="w-5 h-5 text-gray-400" />
+                  <span className="font-medium text-gray-200">About</span>
                 </button>
                 
-                {/* Settings Button - TODO: Add functionality later */}
+                {/* Settings Button */}
                 <button
                   onClick={() => {
-                    // TODO: Add settings modal in next phase
                     onClose()
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl transition-colors opacity-50 cursor-not-allowed"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800 rounded-xl transition-colors opacity-50 cursor-not-allowed"
                   disabled
                 >
-                  <Settings className="w-5 h-5 text-gray-600" />
-                  <span className="font-medium text-gray-900">Settings</span>
-                  <span className="ml-auto text-xs bg-gray-200 px-2 py-1 rounded">Soon</span>
+                  <Settings className="w-5 h-5 text-gray-400" />
+                  <span className="font-medium text-gray-200">Settings</span>
+                  <span className="ml-auto text-xs bg-gray-700 px-2 py-1 rounded text-gray-400">Soon</span>
                 </button>
 
                 {/* Support Section */}
-                <div className="pt-4 mt-4 border-t border-gray-200">
+                <div className="pt-4 mt-4 border-t border-gray-700">
                   <p className="text-xs font-semibold text-gray-500 mb-3 px-4">SUPPORT</p>
                   
                   {/* Donate Button */}
@@ -110,10 +109,10 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                       setShowDonation(true)
                       onClose()
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl transition-all group"
+                    className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-pink-500/20 to-red-500/20 hover:from-pink-500/30 hover:to-red-500/30 border-2 border-pink-500/30 rounded-xl transition-all group"
                   >
-                    <Heart className="w-5 h-5 text-pink-600 group-hover:scale-110 transition-transform" />
-                    <span className="font-semibold text-pink-700">Support the Project</span>
+                    <Heart className="w-5 h-5 text-pink-400 group-hover:scale-110 transition-transform" />
+                    <span className="font-semibold text-pink-300">Support the Project</span>
                   </button>
 
                   {/* Contact on Base */}
@@ -121,28 +120,28 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                     href={baseProfileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full flex items-center gap-3 px-4 py-3 mt-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl transition-all group"
+                    className="w-full flex items-center gap-3 px-4 py-3 mt-2 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 rounded-xl transition-all group"
                   >
-                    <MessageCircle className="w-5 h-5 text-blue-600" />
+                    <MessageCircle className="w-5 h-5 text-blue-400" />
                     <div className="flex-1 text-left">
-                      <div className="font-semibold text-blue-700 flex items-center gap-1">
+                      <div className="font-semibold text-blue-300 flex items-center gap-1">
                         Contact me on Base
                         <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                       </div>
-                      <p className="text-xs text-blue-600">nba0x.base.eth</p>
+                      <p className="text-xs text-blue-400">nba0x.base.eth</p>
                     </div>
                   </a>
                 </div>
 
                 {/* Medical Disclaimer */}
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
+                <div className="mt-6 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
                   <div className="flex items-start gap-2">
-                    <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-xs font-semibold text-yellow-900 mb-1">
+                      <p className="text-xs font-semibold text-yellow-300 mb-1">
                         Medical Disclaimer
                       </p>
-                      <p className="text-xs text-yellow-800 leading-relaxed">
+                      <p className="text-xs text-yellow-200/80 leading-relaxed">
                         This app is for tracking purposes only and does not provide medical advice. 
                         Consult healthcare professionals for addiction treatment.
                       </p>
@@ -151,20 +150,20 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                 </div>
               </nav>
 
-              <div className="p-4 border-t border-gray-200">
+              <div className="p-4 border-t border-gray-700">
                 <button
                   onClick={() => {
                     disconnect()
                     onClose()
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl font-semibold transition-colors border border-red-500/30"
                 >
                   <LogOut className="w-5 h-5" />
                   Disconnect
                 </button>
                 
                 <p className="text-center text-xs text-gray-500 mt-4">
-                  Built on <span className="font-semibold text-blue-600">Base</span> Sepolia
+                  Built on <span className="font-semibold text-blue-400">Base</span> Sepolia
                 </p>
               </div>
             </motion.div>
@@ -180,7 +179,6 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
       />
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
       
-      {/* TOAST */}
       <Toast
         isOpen={toast.isOpen}
         message={toast.message}
