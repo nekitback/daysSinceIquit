@@ -6,7 +6,7 @@ export const useStore = create<StoreState>()(
   persist(
     (set) => ({
       counters: [],
-      selectedColor: '#EF4444',
+      selectedColor: '#3b82f6',
       selectedCategory: 'smoking',
       customName: '',
       
