@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
-import { useAccount, useWatchContractEvent } from 'wagmi'
+import { useState, useEffect } from 'react'
+import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { Menu } from 'lucide-react'
+import { Menu, ExternalLink, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import PendingCounterCard from './components/PendingCounterCard'
 import CounterCard from './components/CounterCard'
 import ColorPicker from './components/ColorPicker'
@@ -26,6 +26,15 @@ import { CONTRACT_ADDRESS, CONTRACT_ABI } from './constants/contract'
 import { useStore } from './store/useStore'
 import type { Counter } from './types'
 
+type PendingTx = {
+  hash: `0x${string}`
+  type: 'create' | 'pause' | 'resume' | 'reset' | 'delete'
+  counterId?: number
+  category?: string
+  color?: string
+  customStartDate?: number | null
+}
+
 function App() {
   const { isConnected, address } = useAccount()
 
@@ -36,7 +45,6 @@ function App() {
     customName,
   } = useStore()
 
-  // Contract hooks
   const { startCounter, isPending, isConfirming } = useStartCounter()
   const { 
     startCounterWithCustomTime, 
@@ -49,15 +57,10 @@ function App() {
   const { deleteCounter } = useDeleteCounter()
   const { counters: activeCounters, refetch } = useGetActiveCounters()
 
-  // Local state
+  const [pendingTxs, setPendingTxs] = useState<PendingTx[]>([])
   const [displayCounters, setDisplayCounters] = useState<Counter[]>([])
-  const [loadingCounters, setLoadingCounters] = useState<Set<number>>(new Set())
   const [customStartDate, setCustomStartDate] = useState<number | null>(null)
 
-  // ✅ useRef для хранения timeout ID - предотвращает утечки
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Modal states
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean
     title: string
@@ -71,7 +74,6 @@ function App() {
     onConfirm: () => {},
   })
 
-  // Toast states
   const [toast, setToast] = useState<{
     isOpen: boolean
     message: string
@@ -82,32 +84,10 @@ function App() {
     type: 'success',
   })
 
-  const [pendingCounter, setPendingCounter] = useState<{
-    category: string
-    color: string
-    customStartDate: number | null
-  } | null>(null)
-
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ isOpen: true, message, type })
   }
 
-  // ✅ Функция для очистки timeout
-  const clearPendingTimeout = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
-    }
-  }
-
-  // ✅ Cleanup при unmount
-  useEffect(() => {
-    return () => {
-      clearPendingTimeout()
-    }
-  }, [])
-
-  // Load counters from contract
   useEffect(() => {
     if (!activeCounters || !address) return
 
@@ -132,116 +112,32 @@ function App() {
     setDisplayCounters(merged)
   }, [activeCounters, address])
 
-  // ✅ Сброс состояния при disconnect
   useEffect(() => {
     if (!isConnected) {
-      setPendingCounter(null)
       setCustomStartDate(null)
       setDisplayCounters([])
-      setLoadingCounters(new Set())
-      clearPendingTimeout()
+      setPendingTxs([])
     }
   }, [isConnected])
 
-  // ✅ ИСПРАВЛЕНО: Event listeners с проверкой адреса и без setTimeout
-  useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    eventName: 'CounterStarted',
-    onLogs(logs) {
-      const eventUser = logs[0]?.args?.user
-      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
-        clearPendingTimeout()
-        setPendingCounter(null)
-        refetch()
-        showToast('✅ Counter created onchain!', 'success')
-      }
-    },
-  })
+  // ✅ ПРОВЕРКА ДУБЛИКАТОВ
+  const checkDuplicateCategory = (categoryName: string): boolean => {
+    const normalizedNew = categoryName.toLowerCase().trim()
+    
+    // Проверяем существующие счетчики
+    const hasDuplicate = displayCounters.some(counter => 
+      counter.category.toLowerCase().trim() === normalizedNew
+    )
+    
+    // Проверяем pending транзакции
+    const hasPendingDuplicate = pendingTxs.some(tx => 
+      tx.type === 'create' && tx.category?.toLowerCase().trim() === normalizedNew
+    )
+    
+    return hasDuplicate || hasPendingDuplicate
+  }
 
-  useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    eventName: 'CounterPaused',
-    onLogs(logs) {
-      const eventUser = logs[0]?.args?.user
-      const id = Number(logs[0]?.args?.id)
-      
-      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
-        setLoadingCounters(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-        refetch()
-      }
-    },
-  })
-
-  useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    eventName: 'CounterResumed',
-    onLogs(logs) {
-      const eventUser = logs[0]?.args?.user
-      const id = Number(logs[0]?.args?.id)
-      
-      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
-        setLoadingCounters(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-        refetch()
-      }
-    },
-  })
-
-  useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    eventName: 'CounterReset',
-    onLogs(logs) {
-      const eventUser = logs[0]?.args?.user
-      const id = Number(logs[0]?.args?.id)
-      
-      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
-        setLoadingCounters(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-        refetch()
-      }
-    },
-  })
-
-  useWatchContractEvent({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    eventName: 'CounterDeleted',
-    onLogs(logs) {
-      const eventUser = logs[0]?.args?.user
-      const id = Number(logs[0]?.args?.id)
-      
-      if (eventUser?.toLowerCase() === address?.toLowerCase()) {
-        setLoadingCounters(prev => {
-          const newSet = new Set(prev)
-          newSet.delete(id)
-          return newSet
-        })
-        refetch()
-      }
-    },
-  })
-
-  // ✅ ПОЛНОСТЬЮ ПЕРЕПИСАН handleQuit
   const handleQuit = async () => {
-    if (pendingCounter !== null) {
-      showToast('⏳ Please wait for current transaction', 'info')
-      return
-    }
-
     if (selectedCategory === 'custom' && !customName.trim()) {
       showToast('Please enter a custom habit name', 'error')
       return
@@ -252,45 +148,34 @@ function App() {
       ? customName 
       : category?.label.replace(/[🚬🍺🍰📱🎮✏️]/g, '').trim() || 'Unknown'
 
+    // ✅ ПРОВЕРКА ДУБЛИКАТА
+    if (checkDuplicateCategory(categoryName)) {
+      showToast(`❌ You already have a "${categoryName}" counter`, 'error')
+      return
+    }
+
     try {
-      // Вызываем контракт СНАЧАЛА (чтобы catch сработал при отмене)
-      let txPromise: Promise<any>
+      let hash: `0x${string}` | undefined
       
       if (customStartDate) {
-        txPromise = startCounterWithCustomTime(categoryName, selectedColor, customStartDate)
+        hash = await startCounterWithCustomTime(categoryName, selectedColor, customStartDate)
       } else {
-        txPromise = startCounter(categoryName, selectedColor)
+        hash = await startCounter(categoryName, selectedColor)
       }
-
-      // Только ПОСЛЕ успешной отправки показываем фантом
-      await txPromise
       
-      // Транзакция отправлена успешно!
-      setPendingCounter({
-        category: categoryName,
-        color: selectedColor,
-        customStartDate: customStartDate
-      })
-
-      // Таймаут на случай если event не сработает
-      clearPendingTimeout()
-      timeoutRef.current = setTimeout(() => {
-        console.warn('Transaction timeout')
-        setPendingCounter(null)
-        refetch() // Попытка обновить на всякий случай
-        showToast('⚠️ Taking longer than expected. Refreshing...', 'info')
-      }, 30000) // 30 секунд
-
+      if (hash) {
+        setPendingTxs(prev => [...prev, {
+          hash,
+          type: 'create',
+          category: categoryName,
+          color: selectedColor,
+          customStartDate: customStartDate
+        }])
+      }
+      
       setCustomStartDate(null)
 
     } catch (error: any) {
-      console.error('Transaction error:', error)
-      
-      // Очищаем все
-      clearPendingTimeout()
-      setPendingCounter(null)
-      
-      // Обработка ошибок
       if (error.code === 4001 || error.message?.includes('User rejected')) {
         showToast('Transaction cancelled', 'info')
       } else if (error.message?.includes('insufficient funds')) {
@@ -301,25 +186,29 @@ function App() {
     }
   }
 
-  // ✅ УПРОЩЕННЫЕ обработчики операций
   const handleReset = async (id: number) => {
     setConfirmModal({
       isOpen: true,
       title: 'Reset Counter?',
-      message: "Are you sure? Your current streak will be saved if it's your longest!",
+      message: "Your current streak will be saved if it's your longest!",
       confirmColor: 'red',
       onConfirm: async () => {
         try {
-          setLoadingCounters(prev => new Set(prev).add(id))
-          await resetCounter(id)
-          // Event listener уберет loading и обновит данные
-        } catch (error) {
-          setLoadingCounters(prev => {
-            const newSet = new Set(prev)
-            newSet.delete(id)
-            return newSet
-          })
-          showToast('❌ Reset failed', 'error')
+          const hash = await resetCounter(id)
+          
+          if (hash) {
+            setPendingTxs(prev => [...prev, {
+              hash,
+              type: 'reset',
+              counterId: id
+            }])
+          }
+        } catch (error: any) {
+          if (error.code === 4001 || error.message?.includes('User rejected')) {
+            showToast('Reset cancelled', 'info')
+          } else {
+            showToast('❌ Reset failed', 'error')
+          }
         }
       },
     })
@@ -327,31 +216,41 @@ function App() {
 
   const handlePause = async (id: number) => {
     try {
-      setLoadingCounters(prev => new Set(prev).add(id))
-      await pauseCounter(id)
-      // Event listener уберет loading
-    } catch (error) {
-      setLoadingCounters(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(id)
-        return newSet
-      })
-      showToast('❌ Pause failed', 'error')
+      const hash = await pauseCounter(id)
+      
+      if (hash) {
+        setPendingTxs(prev => [...prev, {
+          hash,
+          type: 'pause',
+          counterId: id
+        }])
+      }
+    } catch (error: any) {
+      if (error.code === 4001 || error.message?.includes('User rejected')) {
+        showToast('Pause cancelled', 'info')
+      } else {
+        showToast('❌ Pause failed', 'error')
+      }
     }
   }
 
   const handleResume = async (id: number) => {
     try {
-      setLoadingCounters(prev => new Set(prev).add(id))
-      await resumeCounter(id)
-      // Event listener уберет loading
-    } catch (error) {
-      setLoadingCounters(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(id)
-        return newSet
-      })
-      showToast('❌ Resume failed', 'error')
+      const hash = await resumeCounter(id)
+      
+      if (hash) {
+        setPendingTxs(prev => [...prev, {
+          hash,
+          type: 'resume',
+          counterId: id
+        }])
+      }
+    } catch (error: any) {
+      if (error.code === 4001 || error.message?.includes('User rejected')) {
+        showToast('Resume cancelled', 'info')
+      } else {
+        showToast('❌ Resume failed', 'error')
+      }
     }
   }
 
@@ -363,19 +262,99 @@ function App() {
       confirmColor: 'red',
       onConfirm: async () => {
         try {
-          setLoadingCounters(prev => new Set(prev).add(id))
-          await deleteCounter(id)
-          // Event listener уберет loading и обновит
-        } catch (error) {
-          setLoadingCounters(prev => {
-            const newSet = new Set(prev)
-            newSet.delete(id)
-            return newSet
-          })
-          showToast('❌ Delete failed', 'error')
+          const hash = await deleteCounter(id)
+          
+          if (hash) {
+            setDisplayCounters(prev => prev.filter(c => c.id !== id))
+            
+            setPendingTxs(prev => [...prev, {
+              hash,
+              type: 'delete',
+              counterId: id
+            }])
+          }
+        } catch (error: any) {
+          if (error.code === 4001 || error.message?.includes('User rejected')) {
+            showToast('Delete cancelled', 'info')
+          } else {
+            showToast('❌ Delete failed', 'error')
+          }
         }
       },
     })
+  }
+
+  const PendingTransaction = ({ tx }: { tx: PendingTx }) => {
+    const { isLoading, isSuccess, isError } = useWaitForTransactionReceipt({
+      hash: tx.hash,
+    })
+
+    useEffect(() => {
+      if (isSuccess) {
+        refetch()
+        setPendingTxs(prev => prev.filter(t => t.hash !== tx.hash))
+        
+        if (tx.type === 'create') {
+          showToast('✅ Counter created!', 'success')
+        } else if (tx.type === 'delete') {
+          showToast('✅ Counter deleted!', 'success')
+        }
+      }
+      
+      if (isError) {
+        setPendingTxs(prev => prev.filter(t => t.hash !== tx.hash))
+        showToast('❌ Transaction failed', 'error')
+        
+        if (tx.type === 'delete' && tx.counterId) {
+          refetch()
+        }
+      }
+    }, [isSuccess, isError])
+
+    if (tx.type === 'create') {
+      return (
+        <PendingCounterCard
+          category={tx.category!}
+          color={tx.color!}
+          customStartDate={tx.customStartDate}
+          txHash={tx.hash}
+          status={isLoading ? 'pending' : isSuccess ? 'success' : isError ? 'error' : 'pending'}
+        />
+      )
+    }
+
+    const counter = displayCounters.find(c => c.id === tx.counterId)
+    if (!counter) return null
+
+    return (
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center gap-4">
+        {isLoading && <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" />}
+        {isSuccess && <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />}
+        {isError && <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />}
+        
+        <div className="flex-1">
+          <p className="font-semibold text-gray-900">
+            {tx.type === 'pause' && 'Pausing counter...'}
+            {tx.type === 'resume' && 'Resuming counter...'}
+            {tx.type === 'reset' && 'Resetting counter...'}
+            {tx.type === 'delete' && 'Deleting counter...'}
+          </p>
+          <p className="text-sm text-gray-600 font-mono">
+            {counter.category}
+          </p>
+        </div>
+        
+        <a
+          href={`https://sepolia.basescan.org/tx/${tx.hash}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium"
+        >
+          View
+          <ExternalLink className="w-4 h-4" />
+        </a>
+      </div>
+    )
   }
 
   if (!isConnected) {
@@ -406,6 +385,9 @@ function App() {
     )
   }
 
+  const createPendingTx = pendingTxs.find(tx => tx.type === 'create')
+  const operationPendingTxs = pendingTxs.filter(tx => tx.type !== 'create')
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
@@ -432,22 +414,11 @@ function App() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
           
-          {/* Create Counter Card */}
           <section 
             className={`relative bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transition-all ${
-              pendingCounter ? 'opacity-50 pointer-events-none' : ''
+              createPendingTx ? 'opacity-50 pointer-events-none' : ''
             }`}
           >
-            {pendingCounter && (
-              <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-2xl">
-                <div className="text-center">
-                  <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-lg font-semibold text-gray-900">Creating counter...</p>
-                  <p className="text-sm text-gray-600 mt-1">Waiting for confirmation</p>
-                </div>
-              </div>
-            )}
-            
             <div 
               className="px-8 py-6 transition-colors duration-300"
               style={{ 
@@ -477,7 +448,7 @@ function App() {
                   isConfirming || 
                   isPendingCustom ||
                   isConfirmingCustom ||
-                  pendingCounter !== null
+                  createPendingTx !== undefined
                 }
                 className="w-full px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
                 style={{
@@ -489,7 +460,7 @@ function App() {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Confirm in wallet...</span>
                   </div>
-                ) : (isConfirming || isConfirmingCustom || pendingCounter) ? (
+                ) : (isConfirming || isConfirmingCustom || createPendingTx) ? (
                   <div className="flex items-center justify-center gap-3">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Processing...</span>
@@ -501,40 +472,48 @@ function App() {
             </div>
           </section>
 
-          {/* Counters List */}
+          {operationPendingTxs.length > 0 && (
+            <section className="space-y-3">
+              <h3 className="text-lg font-semibold text-gray-900">Pending Transactions</h3>
+              {operationPendingTxs.map(tx => (
+                <PendingTransaction key={tx.hash} tx={tx} />
+              ))}
+            </section>
+          )}
+
           <section>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
                 Your Counters
-                {(displayCounters.length > 0 || pendingCounter) && (
+                {(displayCounters.length > 0 || createPendingTx) && (
                   <span className="text-base px-3 py-1 bg-blue-100 text-blue-600 rounded-full font-semibold">
-                    {displayCounters.length + (pendingCounter ? 1 : 0)}
+                    {displayCounters.length + (createPendingTx ? 1 : 0)}
                   </span>
                 )}
               </h2>
             </div>
             
-            {(displayCounters.length > 0 || pendingCounter) ? (
+            {(displayCounters.length > 0 || createPendingTx) ? (
               <div className="grid gap-6">
-                {pendingCounter && (
-                  <PendingCounterCard
-                    category={pendingCounter.category}
-                    color={pendingCounter.color}
-                    customStartDate={pendingCounter.customStartDate}
-                  />
+                {createPendingTx && (
+                  <PendingTransaction tx={createPendingTx} />
                 )}
                 
-                {displayCounters.map((counter) => (
-                  <CounterCard 
-                    key={counter.id} 
-                    counter={counter}
-                    isLoading={loadingCounters.has(counter.id)}
-                    onReset={handleReset}
-                    onPause={handlePause}
-                    onResume={handleResume}
-                    onDelete={handleDelete}
-                  />
-                ))}
+                {displayCounters.map((counter) => {
+                  const hasPendingOp = operationPendingTxs.some(tx => tx.counterId === counter.id)
+                  
+                  return (
+                    <CounterCard 
+                      key={counter.id} 
+                      counter={counter}
+                      isLoading={hasPendingOp}
+                      onReset={handleReset}
+                      onPause={handlePause}
+                      onResume={handleResume}
+                      onDelete={handleDelete}
+                    />
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">

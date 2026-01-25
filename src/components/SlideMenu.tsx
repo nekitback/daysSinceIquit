@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle } from 'lucide-react'
 import DonationModal from './DonationModal'
 import AboutModal from './AboutModal'
+import Toast from './Toast'
 
 interface Props {
   isOpen: boolean
@@ -16,6 +17,24 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
   const { disconnect } = useDisconnect()
   const [showDonation, setShowDonation] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  
+  const [toast, setToast] = useState<{
+    isOpen: boolean
+    message: string
+    type: 'success' | 'error' | 'info'
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success',
+  })
+
+  const handleDonationSuccess = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({
+      isOpen: true,
+      message,
+      type
+    })
+  }
 
   const baseProfileUrl = 'https://base.app/profile/0x585207f9B4C1FB59c5FC819411E0aCC60BdfFe69'
 
@@ -154,8 +173,21 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
       </AnimatePresence>
 
       {/* Modals */}
-      <DonationModal isOpen={showDonation} onClose={() => setShowDonation(false)} />
+      <DonationModal 
+        isOpen={showDonation} 
+        onClose={() => setShowDonation(false)}
+        onDonationSuccess={handleDonationSuccess}
+      />
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      
+      {/* TOAST */}
+      <Toast
+        isOpen={toast.isOpen}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, isOpen: false })}
+      />
     </>
   )
 }
+

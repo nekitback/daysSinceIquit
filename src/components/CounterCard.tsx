@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Pause, Play, RotateCcw, Trash2, Loader2 } from 'lucide-react'
+import { Pause, Play, RotateCcw, Trash2, Loader2, ExternalLink } from 'lucide-react'
 import type { Counter } from '../types'
 
 interface Props {
@@ -29,7 +29,6 @@ export default function CounterCard({
     return () => clearInterval(interval)
   }, [])
 
-  // ✅ ПРАВИЛЬНАЯ ФУНКЦИЯ formatTime
   const formatTime = (seconds: number) => {
     const days = Math.floor(seconds / 86400)
     const hours = Math.floor((seconds % 86400) / 3600)
@@ -45,7 +44,6 @@ export default function CounterCard({
     return `${minutes}m ${secs}s`
   }
 
-  // ✅ ПРАВИЛЬНЫЙ расчет текущего streak
   const calculateCurrentStreak = () => {
     const now = Math.floor(currentTime / 1000)
     const startedAt = counter.startedAt
@@ -53,10 +51,8 @@ export default function CounterCard({
     const totalPausedTime = counter.totalPausedTime
 
     if (pausedAt > 0) {
-      // Счетчик на паузе
       return pausedAt - startedAt - totalPausedTime
     } else {
-      // Счетчик активен
       return now - startedAt - totalPausedTime
     }
   }
@@ -100,9 +96,21 @@ export default function CounterCard({
                 </span>
               )}
             </div>
-            <p className="text-sm text-gray-500">
-              Started {new Date(counter.startedAt * 1000).toLocaleDateString()}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-gray-500">
+                Started {new Date(counter.startedAt * 1000).toLocaleDateString()}
+              </p>
+              <span className="text-gray-300">•</span>
+              <a
+                href={`https://sepolia.basescan.org/address/0xF6016fCb6653e4D351b976c0574C0359d5D209f4`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium"
+              >
+                View onchain
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
           </div>
           
           <div 
@@ -124,7 +132,6 @@ export default function CounterCard({
           <div>
             <p className="text-xs text-gray-500 mb-1">Longest Streak</p>
             <p className="text-lg font-bold text-gray-900">
-              {/* ✅ КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: longestStreak уже в секундах */}
               {Math.floor(counter.longestStreak / 86400)}d
             </p>
           </div>
@@ -171,13 +178,13 @@ export default function CounterCard({
 
           <button
             onClick={() => onDelete(counter.id)}
-            disabled={isLoading}
+            disabled={isLoading} 
             className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
-      </div>
+      </div> 
     </div>
   )
 }

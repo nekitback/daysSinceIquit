@@ -12,11 +12,12 @@ declare global {
 interface Props {
   isOpen: boolean
   onClose: () => void
-  onDonationSuccess?: (message: string) => void
+  onDonationSuccess?: (message: string, type: 'success' | 'error' | 'info') => void
 }
 
 export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Props) {
   const [copied, setCopied] = useState(false)
+  const [isPending, setIsPending] = useState(false)
   const { address } = useAccount()
   const donationAddress = '0x0648a08c0542d70fd7f8378a9cc2857055bfb3fb' 
 
@@ -27,21 +28,23 @@ export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Pr
   }
 
   const handleDonate = async (amount: string) => {
+    if (!address) {
+      if (onDonationSuccess) {
+        onDonationSuccess('⚠️ Please connect your wallet first', 'error')
+      }
+      return
+    }
+
+    if (!window.ethereum) {
+      if (onDonationSuccess) {
+        onDonationSuccess('⚠️ Wallet not detected', 'error')
+      }
+      return
+    }
+
     try {
-      if (!address) {
-        if (onDonationSuccess) {
-          onDonationSuccess('⚠️ Please connect your wallet first')
-        }
-        return
-      }
-  
-      if (!window.ethereum) {
-        if (onDonationSuccess) {
-          onDonationSuccess('⚠️ Wallet not detected')
-        }
-        return
-      }
-  
+      setIsPending(true)
+      
       const ethAmount = parseFloat(amount)
       const weiAmount = BigInt(Math.floor(ethAmount * 1e18))
       
@@ -56,24 +59,26 @@ export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Pr
       
       console.log('Transaction sent:', tx)
       
-      // Show success toast
       if (onDonationSuccess) {
-        onDonationSuccess('🙏 Thank you for your donation! Your support means everything!')
+        onDonationSuccess('❤️ Thank you so much! Your support means everything to us! 🙏', 'success')
       }
       
       onClose()
       
     } catch (error: any) {
       console.error('Donation error:', error)
+      
       if (error.code === 4001) {
         if (onDonationSuccess) {
-          onDonationSuccess('Transaction cancelled')
+          onDonationSuccess('Transaction cancelled', 'info')
         }
       } else {
         if (onDonationSuccess) {
-          onDonationSuccess('❌ Transaction failed: ' + (error.message || 'Unknown error'))
+          onDonationSuccess('❌ Transaction failed: ' + (error.message || 'Unknown error'), 'error')
         }
       }
+    } finally {
+      setIsPending(false)
     }
   }
 
@@ -151,21 +156,24 @@ export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Pr
                   <div className="grid grid-cols-3 gap-3">
                     <button
                       onClick={() => handleDonate('0.001')}
-                      className="px-4 py-3 bg-gradient-to-br from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl font-semibold text-gray-900 transition-all hover:scale-105"
+                      disabled={isPending}
+                      className="px-4 py-3 bg-gradient-to-br from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl font-semibold text-gray-900 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      0.001 ETH
+                      {isPending ? '...' : '0.001 ETH'}
                     </button>
                     <button
                       onClick={() => handleDonate('0.005')}
-                      className="px-4 py-3 bg-gradient-to-br from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl font-semibold text-gray-900 transition-all hover:scale-105"
+                      disabled={isPending}
+                      className="px-4 py-3 bg-gradient-to-br from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl font-semibold text-gray-900 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      0.005 ETH
+                      {isPending ? '...' : '0.005 ETH'}
                     </button>
                     <button
                       onClick={() => handleDonate('0.01')}
-                      className="px-4 py-3 bg-gradient-to-br from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl font-semibold text-gray-900 transition-all hover:scale-105"
+                      disabled={isPending}
+                      className="px-4 py-3 bg-gradient-to-br from-pink-50 to-red-50 hover:from-pink-100 hover:to-red-100 border-2 border-pink-200 rounded-xl font-semibold text-gray-900 transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      0.01 ETH
+                      {isPending ? '...' : '0.01 ETH'}
                     </button>
                   </div>
                 </div>

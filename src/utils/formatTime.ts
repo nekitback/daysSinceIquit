@@ -7,7 +7,6 @@ export function formatTimeSince(
   
   let effectiveTime: number
   
-  // Если на паузе, не учитываем время с момента паузы
   if (pausedAt > 0) {
     effectiveTime = pausedAt - startedAt - totalPausedTime
   } else {

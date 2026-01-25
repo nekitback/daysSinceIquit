@@ -37,13 +37,24 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                   <X className="w-5 h-5" />
                 </button>
                 
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                    <div className="w-8 h-8 border-2 border-blue-600 rounded"></div>
+                <div className="flex items-center gap-4 mb-2">
+                  {/* Fixed Logo*/}
+                  <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                    <img 
+                       src="Logo.png"
+                      alt="Days Since I Quit Logo" 
+                      className="w-full h-full"
+                      style={{
+                        objectFit: 'contain',
+                        display: 'block',
+                      }}
+                    />
                   </div>
-                  <h2 className="text-3xl font-bold">About Days Since I Quit</h2>
+                  <div>
+                    <h2 className="text-3xl font-bold">About Days Since I Quit</h2>
+                    <p className="text-blue-100">Your journey, permanently on-chain</p>
+                  </div>
                 </div>
-                <p className="text-blue-100">Your journey, permanently on-chain</p>
               </div>
 
               {/* Content */}

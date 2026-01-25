@@ -17,13 +17,12 @@ import { WagmiProvider, createConfig, http } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
-// Настройка коннекторов с приоритетом Coinbase Wallet (Base App)
 const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended for Base',
       wallets: [
-        coinbaseWallet,  // ← ПЕРВЫМ! Для Base App
+        coinbaseWallet,  
         metaMaskWallet,
       ],
     },
