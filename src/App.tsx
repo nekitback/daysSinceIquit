@@ -45,12 +45,13 @@ function App() {
     customName,
   } = useStore()
 
-  const { startCounter, isPending, isConfirming } = useStartCounter()
+  const { startCounter, isPending } = useStartCounter()
+
   const { 
     startCounterWithCustomTime, 
     isPending: isPendingCustom, 
-    isConfirming: isConfirmingCustom,
   } = useStartCounterWithCustomTime()
+
   const { resetCounter } = useResetCounter()
   const { pauseCounter } = usePauseCounter()
   const { resumeCounter } = useResumeCounter()
@@ -453,9 +454,7 @@ function App() {
                   onClick={handleQuit}
                   disabled={
                     isPending || 
-                    isConfirming || 
                     isPendingCustom ||
-                    isConfirmingCustom ||
                     createPendingTx !== undefined
                   }
                   className="w-full px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
@@ -468,7 +467,7 @@ function App() {
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Confirm in wallet...</span>
                     </div>
-                  ) : (isConfirming || isConfirmingCustom || createPendingTx) ? (
+                          ) : createPendingTx ? (
                     <div className="flex items-center justify-center gap-3">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>Processing...</span>

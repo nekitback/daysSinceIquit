@@ -158,3 +158,22 @@ export function useGetActiveCounters() {
 
   return { counters, refetch, isLoading }
 }
+
+export function useCountersCount() {
+  const { address } = useAccount()
+
+  const { data: count, refetch } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: CONTRACT_ABI,
+    functionName: 'countersCount',
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!address,
+    },
+  })
+
+  return { 
+    count: count ? Number(count) : 0, 
+    refetch 
+  }
+}
