@@ -1,283 +1,160 @@
-import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi'
+import { useWriteContract, useReadContract } from 'wagmi'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants/contract'
 import { useAccount } from 'wagmi'
 
-// ========== WRITE FUNCTIONS ==========
-
+// START COUNTER (common)
 export function useStartCounter() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
+  const { writeContractAsync, isPending, isError } = useWriteContract()
 
   const startCounter = async (category: string, color: string) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'startCounter',
-      args: [category, color],
-    })
-    return txHash
+    try {
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'startCounter',
+        args: [category, color],
+      })
+      return hash
+    } catch (error) {
+      console.error('Start counter error:', error)
+      throw error
+    }
   }
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return {
-    startCounter,
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-  }
+  return { startCounter, isPending, isError }
 }
 
+// START COUNTER WITH CUSTOM TIME
 export function useStartCounterWithCustomTime() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
+  const { writeContractAsync, isPending, isError } = useWriteContract()
 
   const startCounterWithCustomTime = async (
     category: string, 
-    color: string,
-    customStartTime: number
+    color: string, 
+    customStartDate: number 
   ) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'startCounterWithCustomTime',
-      args: [category, color, BigInt(customStartTime)],
-    })
-    return txHash
+    try {
+      console.log('📅 Custom start date (seconds):', customStartDate)
+      console.log('📅 Custom start date (readable):', new Date(customStartDate * 1000).toISOString())
+      console.log('⏰ Current time (seconds):', Math.floor(Date.now() / 1000))
+      
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'startCounterWithCustomTime',
+        args: [category, color, BigInt(customStartDate)],  // ← Передаем как есть
+      })
+      return hash
+    } catch (error) {
+      console.error('Start counter with custom time error:', error)
+      throw error
+    }
   }
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return { 
-    startCounterWithCustomTime, 
-    isPending, 
-    isConfirming, 
-    isSuccess,
-    hash,
-  }
+  return { startCounterWithCustomTime, isPending, isError }
 }
 
+// RESET COUNTER
 export function useResetCounter() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
+  const { writeContractAsync, isPending, isError } = useWriteContract()
 
-  const resetCounter = async (id: number) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'resetCounter',
-      args: [BigInt(id)],
-    })
-    return txHash
+  const resetCounter = async (counterId: number) => {
+    try {
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'resetCounter',
+        args: [BigInt(counterId)],
+      })
+      return hash
+    } catch (error) {
+      console.error('Reset counter error:', error)
+      throw error
+    }
   }
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return {
-    resetCounter,
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-  }
+  return { resetCounter, isPending, isError }
 }
 
+// PAUSE COUNTER
 export function usePauseCounter() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
+  const { writeContractAsync, isPending, isError } = useWriteContract()
 
-  const pauseCounter = async (id: number) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'pauseCounter',
-      args: [BigInt(id)],
-    })
-    return txHash
+  const pauseCounter = async (counterId: number) => {
+    try {
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'pauseCounter',
+        args: [BigInt(counterId)],
+      })
+      return hash
+    } catch (error) {
+      console.error('Pause counter error:', error)
+      throw error
+    }
   }
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return {
-    pauseCounter,
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-  }
+  return { pauseCounter, isPending, isError }
 }
 
+// RESUME COUNTER
 export function useResumeCounter() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
+  const { writeContractAsync, isPending, isError } = useWriteContract()
 
-  const resumeCounter = async (id: number) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'resumeCounter',
-      args: [BigInt(id)],
-    })
-    return txHash
+  const resumeCounter = async (counterId: number) => {
+    try {
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'resumeCounter',
+        args: [BigInt(counterId)],
+      })
+      return hash
+    } catch (error) {
+      console.error('Resume counter error:', error)
+      throw error
+    }
   }
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return {
-    resumeCounter,
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-  }
+  return { resumeCounter, isPending, isError }
 }
 
+// DELETE COUNTER
 export function useDeleteCounter() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
+  const { writeContractAsync, isPending, isError } = useWriteContract()
 
-  const deleteCounter = async (id: number) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'deleteCounter',
-      args: [BigInt(id)],
-    })
-    return txHash
+  const deleteCounter = async (counterId: number) => {
+    try {
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
+        abi: CONTRACT_ABI,
+        functionName: 'deleteCounter',
+        args: [BigInt(counterId)],
+      })
+      return hash
+    } catch (error) {
+      console.error('Delete counter error:', error)
+      throw error
+    }
   }
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return {
-    deleteCounter,
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-  }
+  return { deleteCounter, isPending, isError }
 }
 
-export function useUpdateMetadata() {
-  const { writeContractAsync, data: hash, isPending } = useWriteContract()
-
-  const updateMetadata = async (id: number, category: string, color: string) => {
-    const txHash = await writeContractAsync({
-      address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
-      functionName: 'updateMetadata',
-      args: [BigInt(id), category, color],
-    })
-    return txHash
-  }
-
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash,
-  })
-
-  return {
-    updateMetadata,
-    isPending,
-    isConfirming,
-    isSuccess,
-    hash,
-  }
-}
-
-// ========== READ FUNCTIONS ==========
-
-export function useGetCounter(id: number) {
-  const { address } = useAccount()
-
-  const { data, isLoading, error, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getCounter',
-    args: address ? [address, BigInt(id)] : undefined,
-  })
-
-  return {
-    counter: data,
-    isLoading,
-    error,
-    refetch,
-  }
-}
-
-export function useGetCurrentStreak(id: number) {
-  const { address } = useAccount()
-
-  const { data, isLoading, error, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getCurrentStreak',
-    args: address ? [address, BigInt(id)] : undefined,
-  })
-
-  return {
-    streak: data ? Number(data) : 0,
-    isLoading,
-    error,
-    refetch,
-  }
-}
-
-export function useGetRelapseHistory(id: number) {
-  const { address } = useAccount()
-
-  const { data, isLoading, error, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'getRelapseHistory',
-    args: address ? [address, BigInt(id)] : undefined,
-  })
-
-  return {
-    history: data || [],
-    isLoading,
-    error,
-    refetch,
-  }
-}
-
+// GET ACTIVE COUNTERS
 export function useGetActiveCounters() {
   const { address } = useAccount()
 
-  const { data, isLoading, error, refetch } = useReadContract({
+  const { data: counters, refetch, isLoading } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
     functionName: 'getActiveCounters',
     args: address ? [address] : undefined,
+    query: {
+      enabled: !!address,
+    },
   })
 
-  return {
-    counters: data,
-    isLoading,
-    error,
-    refetch,
-  }
-}
-
-export function useCountersCount() {
-  const { address } = useAccount()
-
-  const { data, isLoading, error, refetch } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CONTRACT_ABI,
-    functionName: 'countersCount',
-    args: address ? [address] : undefined,
-  })
-
-  return {
-    count: data ? Number(data) : 0,
-    isLoading,
-    error,
-    refetch,
-  }
+  return { counters, refetch, isLoading }
 }

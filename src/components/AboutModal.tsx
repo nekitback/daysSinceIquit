@@ -170,7 +170,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                       Built with ❤️ on <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="font-bold text-blue-400 hover:text-blue-300">Base</a>
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      Smart contract deployed on Base Sepolia
+                      Smart contract deployed on Base
                     </p>
                   </section>
                 </div>

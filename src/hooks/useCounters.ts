@@ -11,11 +11,9 @@ export function useCounters() {
   useEffect(() => {
     if (!address || count === 0) return
 
-    // Загрузка всех счетчиков пользователя
     const loadCounters = async () => {
       for (let i = 0; i < count; i++) {
-        // Здесь можно использовать useGetCounter для каждого ID
-        // Но для простоты используем локальное хранилище
+    
       }
     }
 

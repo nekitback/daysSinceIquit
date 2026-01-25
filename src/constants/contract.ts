@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0xF6016fCb6653e4D351b976c0574C0359d5D209f4') as `0x${string}`
+export const CONTRACT_ADDRESS = (import.meta.env.VITE_CONTRACT_ADDRESS || '0x6b38dD227700F01Dc9Ee2d6DfCCadfD33bFb4028') as `0x${string}`
 
 export const CONTRACT_ABI = [
   {
@@ -18,7 +18,7 @@ export const CONTRACT_ABI = [
     inputs: [
       { name: 'category', type: 'string' },
       { name: 'color', type: 'string' },
-      { name: 'customStartTime', type: 'uint64' }
+      { name: 'customStartTime', type: 'uint256' } //256
     ],
     outputs: [{ name: '', type: 'uint256' }]
   },

@@ -294,14 +294,21 @@ function App() {
           showToast('✅ Counter created!', 'success')
         } else if (tx.type === 'delete') {
           showToast('✅ Counter deleted!', 'success')
+        } else if (tx.type === 'pause') {
+          showToast('✅ Counter paused!', 'success')
+        } else if (tx.type === 'resume') {
+          showToast('✅ Counter resumed!', 'success')
+        } else if (tx.type === 'reset') {
+          showToast('✅ Counter reset!', 'success')
         }
       }
       
       if (isError) {
+        console.error('Transaction failed:', tx.hash)
         setPendingTxs(prev => prev.filter(t => t.hash !== tx.hash))
         showToast('❌ Transaction failed', 'error')
         
-        if (tx.type === 'delete' && tx.counterId) {
+        if (tx.type === 'delete' && tx.counterId !== undefined) {
           refetch()
         }
       }
@@ -341,7 +348,7 @@ function App() {
         </div>
         
         <a
-          href={`https://sepolia.basescan.org/tx/${tx.hash}`}
+          href={`https://basescan.org/tx/${tx.hash}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-sm font-medium"
@@ -375,7 +382,7 @@ function App() {
           </div>
           
           <p className="text-gray-600 text-sm mt-6">
-            Powered by Base Sepolia
+            Powered by Base
           </p>
         </div>
       </div>

@@ -20,7 +20,7 @@ export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Pr
   const [copied, setCopied] = useState(false)
   const [isPending, setIsPending] = useState(false)
   const { address } = useAccount()
-  const donationAddress = '0x0648a08c0542d70fd7f8378a9cc2857055bfb3fb' 
+  const donationAddress = '0x585207f9B4C1FB59c5FC819411E0aCC60BdfFe69' 
 
   const copyAddress = () => {
     navigator.clipboard.writeText(donationAddress)
@@ -109,7 +109,7 @@ export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Pr
                 <StarfieldBackground />
               </div>
 
-              {/* Контент */}
+              {/* Content */}
               <div className="relative" style={{ zIndex: 2 }}>
                 {/* Header */}
                 <div className="bg-gradient-to-r from-pink-500/90 to-red-500/90 backdrop-blur-sm px-6 py-8 text-white relative border-b border-pink-500/30">
@@ -206,7 +206,7 @@ export default function DonationModal({ isOpen, onClose, onDonationSuccess }: Pr
                       </button>
                     </div>
                     <p className="text-xs text-gray-500 text-center">
-                      Base Sepolia (for testing) • Will switch to Mainnet soon
+                      Base
                     </p>
                   </div>
 

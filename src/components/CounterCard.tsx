@@ -111,7 +111,7 @@ export default function CounterCard({
               </p>
               <span className="text-gray-600">•</span>
               <a
-                href={`https://sepolia.basescan.org/address/0xF6016fCb6653e4D351b976c0574C0359d5D209f4`}
+                href={`https://basescan.org/address/0x6b38dD227700F01Dc9Ee2d6DfCCadfD33bFb4028`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-sm font-medium"

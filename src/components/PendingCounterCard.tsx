@@ -84,7 +84,7 @@ export default function PendingCounterCard({
                 {txHash.slice(0, 10)}...{txHash.slice(-8)}
               </p>
               <a
-                href={`https://sepolia.basescan.org/tx/${txHash}`}
+                href={`https://basescan.org/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm font-medium whitespace-nowrap"

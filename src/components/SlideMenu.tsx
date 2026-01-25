@@ -163,7 +163,7 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                 </button>
                 
                 <p className="text-center text-xs text-gray-500 mt-4">
-                  Built on <span className="font-semibold text-blue-400">Base</span> Sepolia
+                  Built on <span className="font-semibold text-blue-400">Base</span> 
                 </p>
               </div>
             </motion.div>
