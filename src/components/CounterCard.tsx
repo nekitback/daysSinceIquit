@@ -69,18 +69,15 @@ export default function CounterCard({
     : currentStreak
 
   // Share functionality
-  const appUrl = 'https://dsiq.app' // Replace with actual app URL
-  const shareText = `🎉 I've been ${counter.category}-free for ${currentDays} days!\n\nTracking my progress with Days Since I Quit on Base.\n\n${appUrl}`
-  const shareTextShort = `🎉 ${currentDays} days ${counter.category}-free! Tracking on @DaysSinceIQuit`
+  const appUrl = 'https://dsiq.app'
+  const shareText = `🎉 I've been ${counter.category}-free for ${currentDays} days!
 
-  const shareToX = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextShort)}&url=${encodeURIComponent(appUrl)}`
-    window.open(url, '_blank', 'width=550,height=420')
-    setShowShareMenu(false)
-  }
+Tracking my progress with Days Since I Quit on Base.
+
+${appUrl}`
 
   const shareToBaseApp = () => {
-    // Base App compose URL (Warpcast-compatible)
+    // Base App compose URL (Warpcast-compatible) - embeds will show OG card
     const text = `🎉 I've been ${counter.category}-free for ${currentDays} days!\n\nTracking my progress with Days Since I Quit on Base.`
     const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(appUrl)}`
     window.open(url, '_blank')
@@ -90,10 +87,9 @@ export default function CounterCard({
   const shareGeneric = async () => {
     if (navigator.share) {
       try {
+        // Include URL in text for messengers that don't handle url separately
         await navigator.share({
-          title: 'Days Since I Quit',
           text: shareText,
-          url: appUrl,
         })
       } catch (err) {
         // User cancelled or error
@@ -281,22 +277,6 @@ export default function CounterCard({
                         <div className="text-left">
                           <p className="font-medium text-gray-900 dark:text-white text-sm">Base / Warpcast</p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">Post to your feed</p>
-                        </div>
-                      </button>
-
-                      {/* X (Twitter) */}
-                      <button
-                        onClick={shareToX}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      >
-                        <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
-                          <svg className="w-4 h-4 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                          </svg>
-                        </div>
-                        <div className="text-left">
-                          <p className="font-medium text-gray-900 dark:text-white text-sm">X (Twitter)</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Share a tweet</p>
                         </div>
                       </button>
 

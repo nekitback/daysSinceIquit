@@ -26,30 +26,30 @@ function playTone(frequency: number, duration: number, type: OscillatorType = 's
   oscillator.stop(audioContext.currentTime + duration)
 }
 
-// Soft, pleasant sound presets
+// Soft, muted sound presets - lower frequencies for warmer tone
 const sounds: Record<SoundType, () => void> = {
-  // Soft click - gentle tap sound
+  // Soft click - muted, warm tap sound (lowered frequency)
   click: () => {
-    playTone(800, 0.05, 'sine', 0.08)
+    playTone(280, 0.04, 'triangle', 0.06)
   },
   
-  // Success - pleasant ascending chime
+  // Success - warm ascending chime (lowered frequencies)
   success: () => {
-    playTone(523, 0.1, 'sine', 0.1) // C5
-    setTimeout(() => playTone(659, 0.1, 'sine', 0.1), 80) // E5
-    setTimeout(() => playTone(784, 0.15, 'sine', 0.08), 160) // G5
+    playTone(330, 0.12, 'triangle', 0.08) // E4
+    setTimeout(() => playTone(392, 0.12, 'triangle', 0.08), 100) // G4
+    setTimeout(() => playTone(494, 0.15, 'triangle', 0.06), 200) // B4
   },
   
   // Error - soft low tone
   error: () => {
-    playTone(220, 0.15, 'sine', 0.08)
-    setTimeout(() => playTone(196, 0.2, 'sine', 0.06), 100)
+    playTone(180, 0.15, 'triangle', 0.06)
+    setTimeout(() => playTone(150, 0.2, 'triangle', 0.05), 100)
   },
   
-  // Pop - bubbly satisfying pop
+  // Pop - muted satisfying pop
   pop: () => {
-    playTone(600, 0.08, 'sine', 0.1)
-    setTimeout(() => playTone(900, 0.05, 'sine', 0.05), 30)
+    playTone(350, 0.06, 'triangle', 0.07)
+    setTimeout(() => playTone(450, 0.04, 'triangle', 0.04), 25)
   },
 }
 
