@@ -12,6 +12,7 @@ import ConfirmModal from './components/ConfirmModal'
 import Toast from './components/Toast'
 import Logo from './components/Logo'
 import Footer from './components/Footer'
+import WelcomeModal from './components/WelcomeModal'
 import { useTheme, applyTheme } from './hooks/useTheme'
 import SunRaysBackground from './components/SunRaysBackground'
 import StarfieldBackground from './components/StarfieldBackground'
@@ -92,6 +93,22 @@ function App() {
     message: '',
     type: 'success',
   })
+
+  // Welcome modal - show on first visit
+  const [showWelcome, setShowWelcome] = useState(false)
+
+  useEffect(() => {
+    // Check if user has seen the welcome modal
+    const hasSeenWelcome = localStorage.getItem('dsiq-welcome-seen')
+    if (!hasSeenWelcome && isConnected) {
+      setShowWelcome(true)
+    }
+  }, [isConnected])
+
+  const handleCloseWelcome = () => {
+    setShowWelcome(false)
+    localStorage.setItem('dsiq-welcome-seen', 'true')
+  }
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ isOpen: true, message, type })
@@ -584,6 +601,11 @@ function App() {
         message={toast.message}
         type={toast.type}
         onClose={() => setToast({ ...toast, isOpen: false })}
+      />
+
+      <WelcomeModal
+        isOpen={showWelcome}
+        onClose={handleCloseWelcome}
       />
     </div>
   )
