@@ -91,9 +91,10 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ 
-                type: 'tween',
-                duration: 0.25,
-                ease: [0.32, 0.72, 0, 1]
+                type: 'spring',
+                damping: 30,
+                stiffness: 300,
+                mass: 0.8
               }}
               className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 z-50 shadow-2xl will-change-transform"
             >

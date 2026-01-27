@@ -42,30 +42,26 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
               {/* Content */}
               <div className="relative" style={{ zIndex: 2 }}>
                 {/* Header */}
-                <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-blue-500/30 px-6 py-8 relative">
+                <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-blue-500/30 px-5 py-4 relative">
                   <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg transition-colors"
+                    className="absolute top-3 right-3 p-2 hover:bg-gray-200 dark:hover:bg-white/20 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     <X className="w-5 h-5 text-gray-700 dark:text-white" />
                   </button>
                   
-                  <div className="flex items-center gap-4 mb-2">
+                  <div className="flex items-center gap-3">
                     {/* Logo */}
-                    <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                       <img 
                         src="/Logo.png" 
-                        alt="Days Since I Quit Logo" 
-                        className="w-full h-full"
-                        style={{
-                          objectFit: 'contain',
-                          display: 'block',
-                        }}
+                        alt="Logo" 
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     <div>
-                      <h2 className="text-3xl font-bold text-gray-900 dark:text-white">About Days Since I Quit</h2>
-                      <p className="text-blue-600 dark:text-blue-100">Your journey, permanently on-chain</p>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white">About</h2>
+                      <p className="text-xs text-blue-600 dark:text-blue-400">Your journey, permanently on-chain</p>
                     </div>
                   </div>
                 </div>
@@ -170,12 +166,9 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                   </section>
 
                   {/* Built on Base */}
-                  <section className="text-center p-4 bg-gray-100/80 dark:bg-gray-800/50 backdrop-blur-sm rounded-xl border border-gray-300 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Built with ❤️ on <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300">Base</a>
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      Smart contract deployed on Base
+                  <section className="text-center py-2 px-3">
+                    <p className="text-xs text-gray-500 dark:text-gray-500">
+                      Built with ❤️ on <a href="https://base.org" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">Base</a>
                     </p>
                   </section>
                 </div>

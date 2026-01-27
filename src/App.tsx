@@ -410,19 +410,35 @@ function App() {
       {theme === 'light' && <SunRaysBackground />}
       
       <div className="relative" style={{ zIndex: 10 }}>
-        <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 shadow-lg">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setMenuOpen(true)}
-                  className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-                >
-                  <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
-                </button>
-                
-                <Logo size="small" showText={true} />
-              </div>
+        <header className="relative sticky top-0 z-30 overflow-hidden">
+          {/* Animated gradient background - Light theme */}
+          <div 
+            className="absolute inset-0 animate-gradient-x block dark:hidden"
+            style={{
+              background: 'linear-gradient(90deg, rgba(255,255,255,0.95), rgba(59,130,246,0.25), rgba(255,255,255,0.95), rgba(59,130,246,0.25))',
+              backgroundSize: '300% 100%',
+            }}
+          />
+          {/* Animated gradient background - Dark theme */}
+          <div 
+            className="absolute inset-0 animate-gradient-x hidden dark:block"
+            style={{
+              background: 'linear-gradient(90deg, rgba(17,24,39,0.98), rgba(59,130,246,0.12), rgba(17,24,39,0.98), rgba(59,130,246,0.12))',
+              backgroundSize: '300% 100%',
+            }}
+          />
+          
+          <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-14">
+              <button
+                onClick={() => setMenuOpen(true)}
+                className="p-3 hover:bg-white/50 dark:hover:bg-gray-800/50 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
+              </button>
+
+              {/* Center - можно добавить статистику */}
+              <div className="flex-1" />
 
               <div className="w-10" /> {/* Spacer for balance */}
             </div>

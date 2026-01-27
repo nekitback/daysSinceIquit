@@ -1,11 +1,57 @@
 import { useWriteContract, useReadContract, useAccount } from 'wagmi'
+import { useSendCalls } from 'wagmi/experimental'
 import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants/contract'
+import { encodeFunctionData } from 'viem'
+import { useState } from 'react'
 
-// START COUNTER
+// Paymaster URL for sponsored transactions
+const PAYMASTER_URL = import.meta.env.VITE_PAYMASTER_URL || ''
+
+// START COUNTER (with Paymaster support)
 export function useStartCounter() {
-  const { writeContractAsync, isPending, isError } = useWriteContract()
+  const { writeContractAsync, isPending: isPendingRegular, isError } = useWriteContract()
+  const { sendCallsAsync } = useSendCalls()
+  const [isPendingSponsored, setIsPendingSponsored] = useState(false)
 
   const startCounter = async (category: string, color: string) => {
+    // Try sponsored transaction first
+    if (PAYMASTER_URL) {
+      try {
+        setIsPendingSponsored(true)
+        console.log('🎁 Attempting sponsored transaction...')
+        
+        const callData = encodeFunctionData({
+          abi: CONTRACT_ABI,
+          functionName: 'startCounter',
+          args: [category, color],
+        })
+
+        const result = await sendCallsAsync({
+          calls: [{
+            to: CONTRACT_ADDRESS,
+            data: callData,
+          }],
+          capabilities: {
+            paymasterService: {
+              url: PAYMASTER_URL,
+            },
+          },
+        })
+        
+        console.log('✅ Sponsored transaction sent!', result)
+        // sendCallsAsync returns an ID string
+        const callId = typeof result === 'string' ? result : (result as { id?: string })?.id || String(result)
+        return callId as `0x${string}`
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log('⚠️ Sponsored failed, trying regular:', errorMessage)
+      } finally {
+        setIsPendingSponsored(false)
+      }
+    }
+
+    // Fallback to regular transaction
+    console.log('💰 Using regular transaction')
     const hash = await writeContractAsync({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -15,12 +61,14 @@ export function useStartCounter() {
     return hash
   }
 
-  return { startCounter, isPending, isError }
+  return { startCounter, isPending: isPendingRegular || isPendingSponsored, isError }
 }
 
-// START COUNTER WITH CUSTOM TIME
+// START COUNTER WITH CUSTOM TIME (with Paymaster support)
 export function useStartCounterWithCustomTime() {
-  const { writeContractAsync, isPending, isError } = useWriteContract()
+  const { writeContractAsync, isPending: isPendingRegular, isError } = useWriteContract()
+  const { sendCallsAsync } = useSendCalls()
+  const [isPendingSponsored, setIsPendingSponsored] = useState(false)
 
   const startCounterWithCustomTime = async (
     category: string, 
@@ -28,8 +76,41 @@ export function useStartCounterWithCustomTime() {
     customStartDate: number 
   ) => {
     console.log('📅 Custom start date (seconds):', customStartDate)
-    console.log('📅 Custom start date (readable):', new Date(customStartDate * 1000).toISOString())
     
+    if (PAYMASTER_URL) {
+      try {
+        setIsPendingSponsored(true)
+        console.log('🎁 Attempting sponsored transaction...')
+        
+        const callData = encodeFunctionData({
+          abi: CONTRACT_ABI,
+          functionName: 'startCounterWithCustomTime',
+          args: [category, color, BigInt(customStartDate)],
+        })
+
+        const result = await sendCallsAsync({
+          calls: [{
+            to: CONTRACT_ADDRESS,
+            data: callData,
+          }],
+          capabilities: {
+            paymasterService: {
+              url: PAYMASTER_URL,
+            },
+          },
+        })
+        
+        console.log('✅ Sponsored transaction sent!')
+        const callId = typeof result === 'string' ? result : (result as { id?: string })?.id || String(result)
+        return callId as `0x${string}`
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log('⚠️ Sponsored failed, trying regular:', errorMessage)
+      } finally {
+        setIsPendingSponsored(false)
+      }
+    }
+
     const hash = await writeContractAsync({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -39,14 +120,46 @@ export function useStartCounterWithCustomTime() {
     return hash
   }
 
-  return { startCounterWithCustomTime, isPending, isError }
+  return { startCounterWithCustomTime, isPending: isPendingRegular || isPendingSponsored, isError }
 }
 
-// RESET COUNTER
+// RESET COUNTER (with Paymaster support)
 export function useResetCounter() {
-  const { writeContractAsync, isPending, isError } = useWriteContract()
+  const { writeContractAsync, isPending: isPendingRegular, isError } = useWriteContract()
+  const { sendCallsAsync } = useSendCalls()
+  const [isPendingSponsored, setIsPendingSponsored] = useState(false)
 
   const resetCounter = async (counterId: number) => {
+    if (PAYMASTER_URL) {
+      try {
+        setIsPendingSponsored(true)
+        const callData = encodeFunctionData({
+          abi: CONTRACT_ABI,
+          functionName: 'resetCounter',
+          args: [BigInt(counterId)],
+        })
+
+        const result = await sendCallsAsync({
+          calls: [{
+            to: CONTRACT_ADDRESS,
+            data: callData,
+          }],
+          capabilities: {
+            paymasterService: {
+              url: PAYMASTER_URL,
+            },
+          },
+        })
+        const callId = typeof result === 'string' ? result : (result as { id?: string })?.id || String(result)
+        return callId as `0x${string}`
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log('⚠️ Sponsored failed:', errorMessage)
+      } finally {
+        setIsPendingSponsored(false)
+      }
+    }
+
     const hash = await writeContractAsync({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -56,14 +169,46 @@ export function useResetCounter() {
     return hash
   }
 
-  return { resetCounter, isPending, isError }
+  return { resetCounter, isPending: isPendingRegular || isPendingSponsored, isError }
 }
 
-// PAUSE COUNTER
+// PAUSE COUNTER (with Paymaster support)
 export function usePauseCounter() {
-  const { writeContractAsync, isPending, isError } = useWriteContract()
+  const { writeContractAsync, isPending: isPendingRegular, isError } = useWriteContract()
+  const { sendCallsAsync } = useSendCalls()
+  const [isPendingSponsored, setIsPendingSponsored] = useState(false)
 
   const pauseCounter = async (counterId: number) => {
+    if (PAYMASTER_URL) {
+      try {
+        setIsPendingSponsored(true)
+        const callData = encodeFunctionData({
+          abi: CONTRACT_ABI,
+          functionName: 'pauseCounter',
+          args: [BigInt(counterId)],
+        })
+
+        const result = await sendCallsAsync({
+          calls: [{
+            to: CONTRACT_ADDRESS,
+            data: callData,
+          }],
+          capabilities: {
+            paymasterService: {
+              url: PAYMASTER_URL,
+            },
+          },
+        })
+        const callId = typeof result === 'string' ? result : (result as { id?: string })?.id || String(result)
+        return callId as `0x${string}`
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log('⚠️ Sponsored failed:', errorMessage)
+      } finally {
+        setIsPendingSponsored(false)
+      }
+    }
+
     const hash = await writeContractAsync({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -73,14 +218,46 @@ export function usePauseCounter() {
     return hash
   }
 
-  return { pauseCounter, isPending, isError }
+  return { pauseCounter, isPending: isPendingRegular || isPendingSponsored, isError }
 }
 
-// RESUME COUNTER
+// RESUME COUNTER (with Paymaster support)
 export function useResumeCounter() {
-  const { writeContractAsync, isPending, isError } = useWriteContract()
+  const { writeContractAsync, isPending: isPendingRegular, isError } = useWriteContract()
+  const { sendCallsAsync } = useSendCalls()
+  const [isPendingSponsored, setIsPendingSponsored] = useState(false)
 
   const resumeCounter = async (counterId: number) => {
+    if (PAYMASTER_URL) {
+      try {
+        setIsPendingSponsored(true)
+        const callData = encodeFunctionData({
+          abi: CONTRACT_ABI,
+          functionName: 'resumeCounter',
+          args: [BigInt(counterId)],
+        })
+
+        const result = await sendCallsAsync({
+          calls: [{
+            to: CONTRACT_ADDRESS,
+            data: callData,
+          }],
+          capabilities: {
+            paymasterService: {
+              url: PAYMASTER_URL,
+            },
+          },
+        })
+        const callId = typeof result === 'string' ? result : (result as { id?: string })?.id || String(result)
+        return callId as `0x${string}`
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log('⚠️ Sponsored failed:', errorMessage)
+      } finally {
+        setIsPendingSponsored(false)
+      }
+    }
+
     const hash = await writeContractAsync({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -90,14 +267,46 @@ export function useResumeCounter() {
     return hash
   }
 
-  return { resumeCounter, isPending, isError }
+  return { resumeCounter, isPending: isPendingRegular || isPendingSponsored, isError }
 }
 
-// DELETE COUNTER
+// DELETE COUNTER (with Paymaster support)
 export function useDeleteCounter() {
-  const { writeContractAsync, isPending, isError } = useWriteContract()
+  const { writeContractAsync, isPending: isPendingRegular, isError } = useWriteContract()
+  const { sendCallsAsync } = useSendCalls()
+  const [isPendingSponsored, setIsPendingSponsored] = useState(false)
 
   const deleteCounter = async (counterId: number) => {
+    if (PAYMASTER_URL) {
+      try {
+        setIsPendingSponsored(true)
+        const callData = encodeFunctionData({
+          abi: CONTRACT_ABI,
+          functionName: 'deleteCounter',
+          args: [BigInt(counterId)],
+        })
+
+        const result = await sendCallsAsync({
+          calls: [{
+            to: CONTRACT_ADDRESS,
+            data: callData,
+          }],
+          capabilities: {
+            paymasterService: {
+              url: PAYMASTER_URL,
+            },
+          },
+        })
+        const callId = typeof result === 'string' ? result : (result as { id?: string })?.id || String(result)
+        return callId as `0x${string}`
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        console.log('⚠️ Sponsored failed:', errorMessage)
+      } finally {
+        setIsPendingSponsored(false)
+      }
+    }
+
     const hash = await writeContractAsync({
       address: CONTRACT_ADDRESS,
       abi: CONTRACT_ABI,
@@ -107,7 +316,7 @@ export function useDeleteCounter() {
     return hash
   }
 
-  return { deleteCounter, isPending, isError }
+  return { deleteCounter, isPending: isPendingRegular || isPendingSponsored, isError }
 }
 
 // GET ACTIVE COUNTERS (read-only)
