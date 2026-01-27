@@ -60,6 +60,11 @@ export default function CounterCard({
   const currentStreak = calculateCurrentStreak()
   const isPaused = counter.pausedAt > 0
 
+  // UI fix: If longestStreak is 0 (contract bug with custom date), use currentStreak instead
+  const displayLongestStreak = counter.longestStreak > 0 
+    ? counter.longestStreak 
+    : currentStreak
+
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16)
     const g = parseInt(hex.slice(3, 5), 16)
@@ -70,7 +75,7 @@ export default function CounterCard({
   return (
     <div 
       className={`relative rounded-2xl shadow-lg border-2 overflow-hidden transition-all backdrop-blur-sm ${
-        isLoading ? 'opacity-50 pointer-events-none' : 'border-gray-700/50'
+        isLoading ? 'opacity-50 pointer-events-none' : 'border-gray-200/50 dark:border-gray-700/50'
       }`}
       style={{
         background: `linear-gradient(135deg, ${hexToRgba(counter.color, 0.15)}, ${hexToRgba(counter.color, 0.05)})`,
@@ -78,10 +83,10 @@ export default function CounterCard({
     >
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-10">
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-10">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-blue-400 animate-spin mx-auto mb-3" />
-            <p className="text-sm font-semibold text-white">Processing...</p>
+            <Loader2 className="w-12 h-12 text-blue-500 dark:text-blue-400 animate-spin mx-auto mb-3" />
+            <p className="text-sm font-semibold text-gray-900 dark:text-white">Processing...</p>
           </div>
         </div>
       )}
@@ -96,25 +101,25 @@ export default function CounterCard({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-xl font-bold text-white">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                 {counter.category}
               </h3>
               {isPaused && (
-                <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 text-xs font-semibold rounded-full border border-amber-500/30">
+                <span className="px-2 py-0.5 bg-amber-500/20 text-amber-600 dark:text-amber-300 text-xs font-semibold rounded-full border border-amber-500/30">
                   Paused
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Started {new Date(counter.startedAt * 1000).toLocaleDateString()}
               </p>
-              <span className="text-gray-600">•</span>
+              <span className="text-gray-400 dark:text-gray-600">•</span>
               <a
                 href={`https://basescan.org/address/0x6b38dD227700F01Dc9Ee2d6DfCCadfD33bFb4028`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-sm font-medium"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 flex items-center gap-1 text-sm font-medium"
               >
                 View onchain
                 <ExternalLink className="w-3 h-3" />
@@ -130,47 +135,47 @@ export default function CounterCard({
 
         {/* Current Time */}
         <div className="mb-6">
-          <div className="text-4xl font-bold text-white mb-1">
+          <div className="text-4xl font-bold text-gray-900 dark:text-white mb-1">
             {formatTime(currentStreak)}
           </div>
-          <p className="text-sm text-gray-400">Since you quit</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Since you quit</p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-700/50">
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
           <div>
-            <p className="text-xs text-gray-500 mb-1">Longest Streak</p>
-            <p className="text-lg font-bold text-white">
-              {Math.floor(counter.longestStreak / 86400)}d
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">Longest Streak</p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">
+              {Math.floor(displayLongestStreak / 86400)}d
             </p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Total Resets</p>
-            <p className="text-lg font-bold text-white">{counter.totalResets}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">Total Resets</p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">{counter.totalResets}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500 mb-1">Status</p>
-            <p className={`text-lg font-bold ${isPaused ? 'text-amber-400' : 'text-green-400'}`}>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">Status</p>
+            <p className={`text-lg font-bold ${isPaused ? 'text-amber-500 dark:text-amber-400' : 'text-green-500 dark:text-green-400'}`}>
               {isPaused ? 'Paused' : 'Active'}
             </p>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Action Buttons - min 44px touch targets */}
         <div className="flex gap-2 mt-6">
           <button
             onClick={() => isPaused ? onResume(counter.id) : onPause(counter.id)}
             disabled={isLoading}
-            className="flex-1 px-4 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 min-h-[44px] bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPaused ? (
               <>
-                <Play className="w-4 h-4" />
+                <Play className="w-5 h-5" />
                 Resume
               </>
             ) : (
               <>
-                <Pause className="w-4 h-4" />
+                <Pause className="w-5 h-5" />
                 Pause
               </>
             )}
@@ -179,18 +184,18 @@ export default function CounterCard({
           <button
             onClick={() => onReset(counter.id)}
             disabled={isLoading}
-            className="flex-1 px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/30 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 min-h-[44px] bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-300 border border-red-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-5 h-5" />
             Reset
           </button>
 
           <button
             onClick={() => onDelete(counter.id)}
             disabled={isLoading} 
-            className="px-4 py-2.5 bg-gray-700/50 hover:bg-gray-700/70 text-gray-300 border border-gray-600/50 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 min-h-[44px] min-w-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-5 h-5" />
           </button>
         </div>
       </div> 

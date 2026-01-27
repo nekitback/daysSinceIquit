@@ -9,7 +9,11 @@ interface Star {
   twinklePhase: number
 }
 
-export default function StarfieldBackground() {
+interface Props {
+  isModal?: boolean
+}
+
+export default function StarfieldBackground({ isModal = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -19,36 +23,48 @@ export default function StarfieldBackground() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    let animationId: number
+
     const updateSize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      if (isModal && canvas.parentElement) {
+        canvas.width = canvas.parentElement.offsetWidth
+        canvas.height = canvas.parentElement.offsetHeight
+      } else {
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
     }
     updateSize()
-    window.addEventListener('resize', updateSize)
 
-    const starCount = 200 
+    // Use ResizeObserver for modal, window resize for full screen
+    let resizeObserver: ResizeObserver | null = null
+    if (isModal && canvas.parentElement) {
+      resizeObserver = new ResizeObserver(updateSize)
+      resizeObserver.observe(canvas.parentElement)
+    } else {
+      window.addEventListener('resize', updateSize)
+    }
+
+    const starCount = isModal ? 100 : 200
     const stars: Star[] = []
 
     for (let i = 0; i < starCount; i++) {
       stars.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 2 + 0.5, // From 0.5 to 2.5px
+        size: Math.random() * 2 + 0.5,
         opacity: Math.random(),
-        twinkleSpeed: Math.random() * 0.02 + 0.005, // Speed
-        twinklePhase: Math.random() * Math.PI * 2, // Start phase
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinklePhase: Math.random() * Math.PI * 2,
       })
     }
 
-    let animationId: number
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       stars.forEach((star) => {
-        
         star.twinklePhase += star.twinkleSpeed
-
-        const twinkle = (Math.sin(star.twinklePhase) + 1) / 2 // От 0 до 1
+        const twinkle = (Math.sin(star.twinklePhase) + 1) / 2
         const currentOpacity = star.opacity * twinkle
 
         ctx.beginPath()
@@ -72,15 +88,19 @@ export default function StarfieldBackground() {
     animate()
 
     return () => {
-      window.removeEventListener('resize', updateSize)
       cancelAnimationFrame(animationId)
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+      } else {
+        window.removeEventListener('resize', updateSize)
+      }
     }
-  }, [])
+  }, [isModal])
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none"
+      className={`${isModal ? 'absolute' : 'fixed'} inset-0 w-full h-full pointer-events-none`}
       style={{ zIndex: 1 }}
     />
   )

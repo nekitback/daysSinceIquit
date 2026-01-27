@@ -93,20 +93,20 @@ export default function CustomStartDate({ selectedDate, onDateChange }: Props) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-gray-300">
+        <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">
           Start Date
         </label>
         {!showPicker ? (
           <button
             onClick={() => setShowPicker(true)}
-            className="text-sm text-blue-400 hover:text-blue-300 font-medium transition-colors"
+            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium transition-colors min-h-[44px] px-2 flex items-center"
           >
             Set custom date
           </button>
         ) : (
           <button
             onClick={clearDate}
-            className="text-sm text-gray-400 hover:text-gray-300 font-medium transition-colors"
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 font-medium transition-colors min-h-[44px] px-2 flex items-center"
           >
             Use today
           </button>
@@ -114,8 +114,8 @@ export default function CustomStartDate({ selectedDate, onDateChange }: Props) {
       </div>
 
       {showPicker && (
-        <div className="p-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+        <div className="p-4 bg-gray-100 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl space-y-3">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
             <Calendar className="w-4 h-4" />
             <span>Choose your actual quit date</span>
           </div>
@@ -126,22 +126,22 @@ export default function CustomStartDate({ selectedDate, onDateChange }: Props) {
             onChange={handleDateChange}
             max={getMaxDate()}
             min={getMinDate()}
-            className="w-full px-4 py-3 bg-gray-900/50 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
+            className="w-full px-4 min-h-[48px] bg-white dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
           />
           
           {error && (
-            <p className="text-xs text-red-400 flex items-center gap-1">
+            <p className="text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
               ⚠️ {error}
             </p>
           )}
           
           {selectedDate && !error && (
-            <p className="text-xs text-green-400 flex items-center gap-1">
+            <p className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
               ✓ Counter will start from {new Date(selectedDate * 1000).toLocaleDateString()}
             </p>
           )}
           
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-500">
             💡 Tip: Select a date up to 1 year ago
           </p>
         </div>

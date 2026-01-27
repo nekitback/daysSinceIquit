@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Menu, ExternalLink, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import UserButton from './components/UserButton'
 import PendingCounterCard from './components/PendingCounterCard'
 import CounterCard from './components/CounterCard'
 import ColorPicker from './components/ColorPicker'
@@ -12,6 +13,8 @@ import ConfirmModal from './components/ConfirmModal'
 import Toast from './components/Toast'
 import Logo from './components/Logo'
 import Footer from './components/Footer'
+import { useTheme, applyTheme } from './hooks/useTheme'
+import SunRaysBackground from './components/SunRaysBackground'
 import StarfieldBackground from './components/StarfieldBackground'
 import { 
   useStartCounter, 
@@ -38,6 +41,12 @@ type PendingTx = {
 function App() {
   const { isConnected, address } = useAccount()
 
+  const { theme } = useTheme()
+  
+  useEffect(() => {
+    applyTheme(theme)
+  }, [theme])
+
   const [menuOpen, setMenuOpen] = useState(false)
   const { 
     selectedColor, 
@@ -45,11 +54,12 @@ function App() {
     customName,
   } = useStore()
 
-  const { startCounter, isPending } = useStartCounter()
+  const { startCounter, isPending, isSponsored } = useStartCounter()
 
   const { 
     startCounterWithCustomTime, 
     isPending: isPendingCustom, 
+    isSponsored: isSponsoredCustom,
   } = useStartCounterWithCustomTime()
 
   const { resetCounter } = useResetCounter()
@@ -331,19 +341,19 @@ function App() {
     if (!counter) return null
 
     return (
-      <div className="bg-gray-800/50 backdrop-blur-sm border-2 border-gray-700 rounded-xl p-4 flex items-center gap-4">
-        {isLoading && <Loader2 className="w-5 h-5 text-blue-400 animate-spin flex-shrink-0" />}
-        {isSuccess && <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />}
-        {isError && <XCircle className="w-5 h-5 text-red-400 flex-shrink-0" />}
+      <div className="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border-2 border-gray-200 dark:border-gray-700 rounded-xl p-4 flex items-center gap-4">
+        {isLoading && <Loader2 className="w-5 h-5 text-blue-500 dark:text-blue-400 animate-spin flex-shrink-0" />}
+        {isSuccess && <CheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0" />}
+        {isError && <XCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />}
         
         <div className="flex-1">
-          <p className="font-semibold text-white">
+          <p className="font-semibold text-gray-900 dark:text-white">
             {tx.type === 'pause' && 'Pausing counter...'}
             {tx.type === 'resume' && 'Resuming counter...'}
             {tx.type === 'reset' && 'Resetting counter...'}
             {tx.type === 'delete' && 'Deleting counter...'}
           </p>
-          <p className="text-sm text-gray-400 font-mono">
+          <p className="text-sm text-gray-600 dark:text-gray-400 font-mono">
             {counter.category}
           </p>
         </div>
@@ -352,7 +362,7 @@ function App() {
           href={`https://basescan.org/tx/${tx.hash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 flex items-center gap-1 text-sm font-medium"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1 text-sm font-medium min-h-[44px] px-2"
         >
           View
           <ExternalLink className="w-4 h-4" />
@@ -363,17 +373,18 @@ function App() {
 
   if (!isConnected) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 flex items-center justify-center px-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-sky-200 via-blue-100 to-cyan-100 dark:from-gray-900 dark:via-black dark:to-gray-800 flex items-center justify-center px-4 relative overflow-hidden">
         <StarfieldBackground />
+        {theme === 'light' && <SunRaysBackground />}
         <div className="text-center max-w-md w-full relative" style={{ zIndex: 10 }}>
           <div className="flex justify-center mb-8">
             <Logo size="large" showText={false} />
           </div>
           
-          <h1 className="text-5xl font-bold text-white mb-3">
+          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
             Days Since I Quit
           </h1>
-          <p className="text-gray-400 mb-8 text-lg">
+          <p className="text-gray-700 dark:text-gray-400 mb-8 text-lg">
             Track your journey onchain.<br />
             Built on <span className="text-blue-500 font-semibold">Base</span>.
           </p>
@@ -382,7 +393,7 @@ function App() {
             <ConnectButton />
           </div>
           
-          <p className="text-gray-600 text-sm mt-6">
+          <p className="text-gray-500 dark:text-gray-600 text-sm mt-6">
             Powered by Base
           </p>
         </div>
@@ -394,25 +405,26 @@ function App() {
   const operationPendingTxs = pendingTxs.filter(tx => tx.type !== 'create')
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 relative overflow-hidden">
-      <StarfieldBackground />
+    <div className="min-h-screen bg-gradient-to-br from-sky-200 via-blue-100 to-cyan-100 dark:from-gray-900 dark:via-black dark:to-gray-800 flex items-center justify-center px-4 relative overflow-hidden">
+      <StarfieldBackground /> 
+      {theme === 'light' && <SunRaysBackground />}
       
       <div className="relative" style={{ zIndex: 10 }}>
-        <header className="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-30 shadow-lg">
+        <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 shadow-lg">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setMenuOpen(true)}
-                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                 >
-                  <Menu className="w-6 h-6 text-gray-300" />
+                  <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                 </button>
                 
                 <Logo size="small" showText={true} />
               </div>
 
-              <ConnectButton />
+              <UserButton />
             </div>
           </div>
         </header>
@@ -423,7 +435,7 @@ function App() {
           <div className="max-w-4xl mx-auto space-y-8">
             
             <section 
-              className={`relative bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-800 overflow-hidden transition-all ${
+              className={`relative bg-white/80 dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden transition-all ${
                 createPendingTx ? 'opacity-50 pointer-events-none' : ''
               }`}
             >
@@ -434,10 +446,10 @@ function App() {
                   borderBottom: `2px solid ${selectedColor}44`
                 }}
               >
-                <h2 className="text-2xl font-bold text-white drop-shadow-lg">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white drop-shadow-lg">
                   Start a New Counter
                 </h2>
-                <p className="text-gray-400 text-sm mt-1">
+                <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
                   All data stored permanently onchain
                 </p>
               </div>
@@ -450,38 +462,54 @@ function App() {
                   onDateChange={setCustomStartDate}
                 />
                 
-                <button
-                  onClick={handleQuit}
-                  disabled={
-                    isPending || 
-                    isPendingCustom ||
-                    createPendingTx !== undefined
-                  }
-                  className="w-full px-6 py-4 rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
-                  style={{
-                    background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
-                  }}
-                >
-                  {(isPending || isPendingCustom) ? (
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Confirm in wallet...</span>
-                    </div>
-                          ) : createPendingTx ? (
-                    <div className="flex items-center justify-center gap-3">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Processing...</span>
-                    </div>
-                  ) : (
-                    'I Quit! 🚀'
+                <div className="space-y-2">
+                  <button
+                    onClick={handleQuit}
+                    disabled={
+                      isPending || 
+                      isPendingCustom ||
+                      createPendingTx !== undefined
+                    }
+                    className="w-full px-6 min-h-[52px] rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
+                    style={{
+                      background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
+                    }}
+                  >
+                    {(isPending || isPendingCustom) ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Confirm in wallet...</span>
+                      </div>
+                    ) : createPendingTx ? (
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Processing...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        <span>I Quit!</span>
+                        {(isSponsored || isSponsoredCustom) && (
+                          <span className="px-2 py-0.5 bg-green-400/30 text-green-100 text-xs font-semibold rounded-full">
+                            FREE
+                          </span>
+                        )}
+                        <span>🚀</span>
+                      </div>
+                    )}
+                  </button>
+                  
+                  {(isSponsored || isSponsoredCustom) && (
+                    <p className="text-center text-xs text-green-600 dark:text-green-400">
+                      ✨ Gas fees sponsored by Base
+                    </p>
                   )}
-                </button>
+                </div>
               </div>
             </section>
 
             {operationPendingTxs.length > 0 && (
               <section className="space-y-3">
-                <h3 className="text-lg font-semibold text-white">Pending Transactions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Pending Transactions</h3>
                 {operationPendingTxs.map(tx => (
                   <PendingTransaction key={tx.hash} tx={tx} />
                 ))}
@@ -490,10 +518,10 @@ function App() {
 
             <section>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                   Your Counters
                   {(displayCounters.length > 0 || createPendingTx) && (
-                    <span className="text-base px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full font-semibold border border-blue-500/30">
+                    <span className="text-base px-3 py-1 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-full font-semibold border border-blue-500/30">
                       {displayCounters.length + (createPendingTx ? 1 : 0)}
                     </span>
                   )}
@@ -523,14 +551,14 @@ function App() {
                   })}
                 </div>
               ) : (
-                <div className="text-center py-16 bg-gray-900/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-700">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-800 rounded-full flex items-center justify-center">
+                <div className="text-center py-16 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
                     <span className="text-3xl">🎯</span>
                   </div>
-                  <p className="text-lg font-medium text-white mb-2">
+                  <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     No counters yet
                   </p>
-                  <p className="text-gray-400">
+                  <p className="text-gray-600 dark:text-gray-400">
                     Start your journey by creating your first counter!
                   </p>
                 </div>

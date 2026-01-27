@@ -16,7 +16,7 @@ export default function ColorPicker() {
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-semibold text-gray-300">
+      <label className="block text-sm font-semibold text-gray-900 dark:text-gray-300">
         Choose a Color
       </label>
       <div className="grid grid-cols-4 gap-3">
@@ -24,10 +24,10 @@ export default function ColorPicker() {
           <button
             key={color.id}
             onClick={() => setSelectedColor(color.value)}
-            className={`group relative h-12 rounded-xl transition-all ${
+            className={`group relative min-h-[48px] rounded-xl transition-all ${
               selectedColor === color.value
-                ? 'ring-2 ring-offset-2 ring-offset-gray-900 scale-105'
-                : 'hover:scale-105 bg-gray-800/50 border border-gray-700'
+                ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 scale-105'
+                : 'hover:scale-105 bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700'
             }`}
             style={{
               background: selectedColor === color.value 
@@ -47,7 +47,7 @@ export default function ColorPicker() {
               />
             )}
             <span className={`relative text-xs font-medium ${
-              selectedColor === color.value ? 'text-white' : 'text-gray-400'
+              selectedColor === color.value ? 'text-white' : 'text-gray-700 dark:text-gray-400'
             }`}>
               {color.label}
             </span>
