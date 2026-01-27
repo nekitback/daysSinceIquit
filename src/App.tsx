@@ -27,6 +27,7 @@ import {
 } from './hooks/useContract'
 import { PRESET_CATEGORIES } from './constants/categories'
 import { useStore } from './store/useStore'
+import { useSound, useGlobalButtonSounds } from './hooks/useSound'
 import type { Counter } from './types'
 
 type PendingTx = {
@@ -52,7 +53,12 @@ function App() {
     selectedColor, 
     selectedCategory, 
     customName,
+    addCustomDateCounter,
   } = useStore()
+  const { play: playSound } = useSound()
+  
+  // Enable click sounds on ALL buttons globally
+  useGlobalButtonSounds()
 
   const { startCounter, isPending } = useStartCounter()
 
@@ -112,6 +118,9 @@ function App() {
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
     setToast({ isOpen: true, message, type })
+    // Play sound based on toast type
+    if (type === 'success') playSound('success')
+    else if (type === 'error') playSound('error')
   }
 
   useEffect(() => {
@@ -136,7 +145,32 @@ function App() {
     })
 
     setDisplayCounters(merged)
-  }, [activeCounters, address])
+    
+    // Process pending custom date counters
+    const pendingCustomDates = JSON.parse(localStorage.getItem('dsiq-pending-custom-dates') || '[]') as number[]
+    if (pendingCustomDates.length > 0) {
+      const remainingPending: number[] = []
+      
+      pendingCustomDates.forEach((customDate) => {
+        // Find counter with matching startedAt
+        const matchingCounter = merged.find(c => c.startedAt === customDate)
+        if (matchingCounter) {
+          // Mark this counter as created with custom date
+          addCustomDateCounter(matchingCounter.id)
+        } else {
+          // Keep in pending if not found yet
+          remainingPending.push(customDate)
+        }
+      })
+      
+      // Update localStorage with remaining pending
+      if (remainingPending.length > 0) {
+        localStorage.setItem('dsiq-pending-custom-dates', JSON.stringify(remainingPending))
+      } else {
+        localStorage.removeItem('dsiq-pending-custom-dates')
+      }
+    }
+  }, [activeCounters, address, addCustomDateCounter])
 
   useEffect(() => {
     if (!isConnected) {
@@ -313,7 +347,24 @@ function App() {
 
     useEffect(() => {
       if (isSuccess) {
-        refetch()
+        // If this was a create with custom date, mark the counter as ineligible for achievements
+        if (tx.type === 'create' && tx.customStartDate) {
+          // After refetch, find the counter with matching startedAt and mark it
+          refetch().then(() => {
+            // We need to find the newly created counter by its startedAt matching customStartDate
+            // This will be handled by watching activeCounters changes
+            const pendingCustomDate = tx.customStartDate
+            if (pendingCustomDate) {
+              // Store in localStorage for post-refetch processing
+              const pending = JSON.parse(localStorage.getItem('dsiq-pending-custom-dates') || '[]')
+              pending.push(pendingCustomDate)
+              localStorage.setItem('dsiq-pending-custom-dates', JSON.stringify(pending))
+            }
+          })
+        } else {
+          refetch()
+        }
+        
         setPendingTxs(prev => prev.filter(t => t.hash !== tx.hash))
         
         if (tx.type === 'create') {

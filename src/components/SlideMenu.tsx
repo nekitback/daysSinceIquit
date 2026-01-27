@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle, ChevronRight, User } from 'lucide-react'
+import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle, ChevronRight, User, Trophy, BarChart3 } from 'lucide-react'
 import DonationModal from './DonationModal'
 import AboutModal from './AboutModal'
+import AchievementsModal from './AchievementsModal'
+import StatisticsModal from './StatisticsModal'
 import Toast from './Toast'
 import SettingsComponent from './Settings'
 import { getName, getAvatar } from '@coinbase/onchainkit/identity'
@@ -19,6 +21,8 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
   const { disconnect } = useDisconnect()
   const [showDonation, setShowDonation] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const [showAchievements, setShowAchievements] = useState(false)
+  const [showStatistics, setShowStatistics] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   
   // Identity data with fallbacks
@@ -159,7 +163,58 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
               </div>
 
               <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                {/* About Button */}
+                {/* 1. Statistics Button */}
+                <button
+                  onClick={() => {
+                    setShowStatistics(true)
+                    onClose()
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="w-5 h-5 text-blue-500" />
+                    <div className="text-left">
+                      <p className="font-semibold text-gray-900 dark:text-white">Statistics</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Charts & insights</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                </button>
+
+                {/* 2. Achievements Button */}
+                <button
+                  onClick={() => {
+                    setShowAchievements(true)
+                    onClose()
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <Trophy className="w-5 h-5 text-amber-500" />
+                    <div className="text-left">
+                      <p className="font-semibold text-gray-900 dark:text-white">Achievements</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Your milestones</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                </button>
+                
+                {/* 3. Settings Button */}
+                <button
+                  onClick={() => setSettingsOpen(true)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <Settings className="w-5 h-5 text-gray-500" />
+                    <div className="text-left">
+                      <p className="font-semibold text-gray-900 dark:text-white">Settings</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Theme & preferences</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
+                </button>
+
+                {/* 4. About Button */}
                 <button
                   onClick={() => {
                     setShowAbout(true)
@@ -167,23 +222,8 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
                 >
-                  <Info className="w-5 h-5 text-gray-700 dark:text-gray-400" />
+                  <Info className="w-5 h-5 text-gray-400" />
                   <span className="font-medium text-gray-900 dark:text-gray-200">About</span>
-                </button>
-                
-                {/* Settings Button */}
-                <button
-                  onClick={() => setSettingsOpen(true)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <Settings className="w-5 h-5 text-blue-500" />
-                    <div className="text-left">
-                      <p className="font-semibold text-gray-900 dark:text-white">Settings</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Theme & preferences</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300" />
                 </button>
 
                 {/* Support Section */}
@@ -265,6 +305,8 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
         onDonationSuccess={handleDonationSuccess}
       />
       <AboutModal isOpen={showAbout} onClose={() => setShowAbout(false)} />
+      <AchievementsModal isOpen={showAchievements} onClose={() => setShowAchievements(false)} />
+      <StatisticsModal isOpen={showStatistics} onClose={() => setShowStatistics(false)} />
       
       <Toast
         isOpen={toast.isOpen}

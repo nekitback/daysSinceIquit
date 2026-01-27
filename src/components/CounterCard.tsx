@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Pause, Play, RotateCcw, Trash2, Loader2, ExternalLink } from 'lucide-react'
+import { Pause, Play, RotateCcw, Trash2, Loader2, ExternalLink, Share2 } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import type { Counter } from '../types'
 
 interface Props {
@@ -20,6 +21,7 @@ export default function CounterCard({
   onDelete 
 }: Props) {
   const [currentTime, setCurrentTime] = useState(Date.now())
+  const [showShareMenu, setShowShareMenu] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -59,11 +61,55 @@ export default function CounterCard({
 
   const currentStreak = calculateCurrentStreak()
   const isPaused = counter.pausedAt > 0
+  const currentDays = Math.floor(currentStreak / 86400)
 
   // UI fix: If longestStreak is 0 (contract bug with custom date), use currentStreak instead
   const displayLongestStreak = counter.longestStreak > 0 
     ? counter.longestStreak 
     : currentStreak
+
+  // Share functionality
+  const appUrl = 'https://dsiq.app' // Replace with actual app URL
+  const shareText = `🎉 I've been ${counter.category}-free for ${currentDays} days!\n\nTracking my progress with Days Since I Quit on Base.\n\n${appUrl}`
+  const shareTextShort = `🎉 ${currentDays} days ${counter.category}-free! Tracking on @DaysSinceIQuit`
+
+  const shareToX = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextShort)}&url=${encodeURIComponent(appUrl)}`
+    window.open(url, '_blank', 'width=550,height=420')
+    setShowShareMenu(false)
+  }
+
+  const shareToBaseApp = () => {
+    // Base App compose URL (Warpcast-compatible)
+    const text = `🎉 I've been ${counter.category}-free for ${currentDays} days!\n\nTracking my progress with Days Since I Quit on Base.`
+    const url = `https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(appUrl)}`
+    window.open(url, '_blank')
+    setShowShareMenu(false)
+  }
+
+  const shareGeneric = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Days Since I Quit',
+          text: shareText,
+          url: appUrl,
+        })
+      } catch (err) {
+        // User cancelled or error
+        console.log('Share cancelled')
+      }
+    } else {
+      // Fallback: copy to clipboard
+      try {
+        await navigator.clipboard.writeText(shareText)
+        alert('Copied to clipboard!')
+      } catch (err) {
+        console.error('Failed to copy')
+      }
+    }
+    setShowShareMenu(false)
+  }
 
   const hexToRgba = (hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16)
@@ -189,6 +235,90 @@ export default function CounterCard({
             <RotateCcw className="w-5 h-5" />
             Reset
           </button>
+
+          {/* Share Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowShareMenu(!showShareMenu)}
+              disabled={isLoading}
+              className="px-4 min-h-[44px] min-w-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Share2 className="w-5 h-5" />
+            </button>
+
+            {/* Share Menu Popup */}
+            <AnimatePresence>
+              {showShareMenu && (
+                <>
+                  {/* Backdrop */}
+                  <div 
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowShareMenu(false)}
+                  />
+                  
+                  {/* Menu */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    className="absolute right-0 bottom-full mb-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                  >
+                    <div className="p-2">
+                      <p className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                        Share your progress
+                      </p>
+                      
+                      {/* Base App / Warpcast */}
+                      <button
+                        onClick={shareToBaseApp}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" stroke="currentColor" fill="none"/>
+                          </svg>
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium text-gray-900 dark:text-white text-sm">Base / Warpcast</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Post to your feed</p>
+                        </div>
+                      </button>
+
+                      {/* X (Twitter) */}
+                      <button
+                        onClick={shareToX}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-black dark:bg-white rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-white dark:text-black" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                          </svg>
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium text-gray-900 dark:text-white text-sm">X (Twitter)</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Share a tweet</p>
+                        </div>
+                      </button>
+
+                      {/* Generic Share / Copy */}
+                      <button
+                        onClick={shareGeneric}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
+                          <Share2 className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <p className="font-medium text-gray-900 dark:text-white text-sm">More options</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">Messengers & copy link</p>
+                        </div>
+                      </button>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
 
           <button
             onClick={() => onDelete(counter.id)}
