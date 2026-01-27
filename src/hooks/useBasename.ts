@@ -1,21 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 
-// Base L2 Resolver contract
-const L2_RESOLVER_ADDRESS = '0xC6d566A56A1aFf6508b41f6c90ff131615583BCD'
-const BASENAME_L2_RESOLVER_ABI = [
-  {
-    inputs: [{ name: 'name', type: 'bytes32' }],
-    name: 'name',
-    outputs: [{ name: '', type: 'string' }],
-    stateMutability: 'view',
-    type: 'function',
-  },
-] as const
-
-// Basename registry for reverse lookup
-const BASENAME_REVERSE_REGISTRAR = '0x79ea96012eea67a83431f1701b3dff7e37f9e282'
-
 interface BasenameData {
   name: string | null
   avatar: string | null

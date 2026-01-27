@@ -1,4 +1,3 @@
-import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useBasename } from '../hooks/useBasename'
 import { User, ChevronDown } from 'lucide-react'
@@ -8,7 +7,6 @@ import { User, ChevronDown } from 'lucide-react'
  * Meets Base Featured guidelines: "Display user's avatar and username (NO 0x addresses)"
  */
 export default function UserButton() {
-  const { isConnected } = useAccount()
   const { name: basename, avatar, isLoading } = useBasename()
 
   return (

@@ -237,7 +237,7 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
             onClick={() => setSettingsOpen(false)}
           />
           <div className="fixed top-0 right-0 h-full w-80 bg-white dark:bg-gray-900 z-50 shadow-2xl transform transition-transform">
-            <SettingsComponent onClose={() => setSettingsOpen(false)} />
+            <SettingsComponent />
           </div>
         </>
       )}

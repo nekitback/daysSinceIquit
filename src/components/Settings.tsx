@@ -1,11 +1,7 @@
 import { Sun, Moon } from 'lucide-react'
 import { useTheme } from '../hooks/useTheme'
 
-interface Props {
-  onClose: () => void
-}
-
-export default function Settings({ onClose }: Props) {
+export default function Settings() {
   const { theme, toggleTheme } = useTheme()
 
   return (
