@@ -48,25 +48,6 @@ function App() {
     applyTheme(theme)
   }, [theme])
 
-  // Deep link to Base App on mobile (outside of Base App)
-  useEffect(() => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
-    const isInBaseApp = window.location.hostname.includes('base') || 
-                        window.navigator.userAgent.includes('Base') ||
-                        (window as any).__BASE_APP__
-    
-    // Only redirect on mobile and not already in Base App
-    if (isMobile && !isInBaseApp && !sessionStorage.getItem('base-redirect-attempted')) {
-      sessionStorage.setItem('base-redirect-attempted', 'true')
-      
-      const appUrl = import.meta.env.VITE_APP_URL || 'https://days-since-iquit.vercel.app'
-      const baseDeepLink = `https://base.org/open?url=${encodeURIComponent(appUrl)}`
-      
-      // Try to open Base App, fallback to web if app not installed
-      window.location.href = baseDeepLink
-    }
-  }, [])
-
   const [menuOpen, setMenuOpen] = useState(false)
   const { 
     selectedColor, 
