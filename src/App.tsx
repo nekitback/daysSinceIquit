@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 import { Menu, ExternalLink, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { ConnectWallet, Wallet } from '@coinbase/onchainkit/wallet'
-import UserButton from './components/UserButton'
 import PendingCounterCard from './components/PendingCounterCard'
 import CounterCard from './components/CounterCard'
 import ColorPicker from './components/ColorPicker'
@@ -414,7 +413,7 @@ function App() {
         <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30 shadow-lg">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => setMenuOpen(true)}
                   className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -422,10 +421,10 @@ function App() {
                   <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                 </button>
                 
-                <Logo size="small" showText={false} />
+                <Logo size="small" showText={true} />
               </div>
 
-              <UserButton />
+              <div className="w-10" /> {/* Spacer for balance */}
             </div>
           </div>
         </header>

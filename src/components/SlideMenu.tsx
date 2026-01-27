@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle, ChevronRight } from 'lucide-react'
+import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle, ChevronRight, User } from 'lucide-react'
 import DonationModal from './DonationModal'
 import AboutModal from './AboutModal'
 import Toast from './Toast'
 import SettingsComponent from './Settings'
-import { Identity, Name, Avatar, Address } from '@coinbase/onchainkit/identity'
+import { getName, getAvatar } from '@coinbase/onchainkit/identity'
+import { base } from 'viem/chains'
 
 interface Props {
   isOpen: boolean
@@ -20,6 +21,37 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
   const [showAbout, setShowAbout] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   
+  // Identity data with fallbacks
+  const [basename, setBasename] = useState<string | null>(null)
+  const [avatar, setAvatar] = useState<string | null>(null)
+  const [isLoadingIdentity, setIsLoadingIdentity] = useState(false)
+
+  useEffect(() => {
+    if (!address) {
+      setBasename(null)
+      setAvatar(null)
+      return
+    }
+
+    const fetchIdentity = async () => {
+      setIsLoadingIdentity(true)
+      try {
+        const [nameResult, avatarResult] = await Promise.all([
+          getName({ address, chain: base }).catch(() => null),
+          getAvatar({ ensName: address, chain: base }).catch(() => null),
+        ])
+        setBasename(nameResult)
+        setAvatar(avatarResult)
+      } catch (e) {
+        console.log('Identity fetch error:', e)
+      } finally {
+        setIsLoadingIdentity(false)
+      }
+    }
+
+    fetchIdentity()
+  }, [address])
+
   const [toast, setToast] = useState<{
     isOpen: boolean
     message: string
@@ -49,15 +81,21 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
               onClick={onClose}
               className="fixed inset-0 bg-black/30 dark:bg-black/50 z-40"
             />
 
             <motion.div
-              initial={{ x: -320 }}
+              initial={{ x: '-100%' }}
               animate={{ x: 0 }}
-              exit={{ x: -320 }}
-              className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 z-50 shadow-2xl"
+              exit={{ x: '-100%' }}
+              transition={{ 
+                type: 'tween',
+                duration: 0.25,
+                ease: [0.32, 0.72, 0, 1]
+              }}
+              className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 z-50 shadow-2xl will-change-transform"
             >
               <div className="p-6 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex items-center justify-between mb-4">
@@ -67,18 +105,42 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                   </button>
                 </div>
 
-                {/* User Identity Card - OnchainKit */}
+                {/* User Identity Card */}
                 {address && (
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl p-4">
-                    <Identity 
-                      address={address}
-                      className="!bg-transparent !p-0"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="!w-12 !h-12 !rounded-full !border-2 !border-blue-300 dark:!border-blue-500" />
-                        <div className="flex-1 min-w-0">
-                          <Name className="!font-bold !text-gray-900 dark:!text-white !text-base" />
-                          <Address className="!text-xs !text-gray-500 dark:!text-gray-400 !font-mono" />
+                    <div className="flex items-center gap-3">
+                      {/* Avatar with fallback */}
+                      {isLoadingIdentity ? (
+                        <div className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                      ) : avatar ? (
+                        <img 
+                          src={avatar} 
+                          alt="Avatar" 
+                          className="w-12 h-12 rounded-full object-cover border-2 border-blue-300 dark:border-blue-500"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center border-2 border-blue-300 dark:border-blue-500">
+                          <User className="w-6 h-6 text-white" />
+                        </div>
+                      )}
+                      
+                      <div className="flex-1 min-w-0">
+                        {/* Name with fallback */}
+                        {isLoadingIdentity ? (
+                          <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        ) : (
+                          <p className="font-bold text-gray-900 dark:text-white text-base truncate">
+                            {basename || 'Connected'}
+                          </p>
+                        )}
+                        
+                        {/* Always show address */}
+                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">
+                          {address.slice(0, 6)}...{address.slice(-4)}
+                        </p>
+                        
+                        {/* Show "Get Basename" link if no basename */}
+                        {!basename && !isLoadingIdentity && (
                           <a 
                             href="https://www.base.org/names" 
                             target="_blank" 
@@ -88,9 +150,9 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                             Get your Basename
                             <ExternalLink className="w-3 h-3" />
                           </a>
-                        </div>
+                        )}
                       </div>
-                    </Identity>
+                    </div>
                   </div>
                 )}
               </div>
