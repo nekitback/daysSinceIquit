@@ -1,6 +1,6 @@
 import { frames } from "frames.js/next";
 
-export const GET = frames(async () => ({
+export default frames(async () => ({
   image: (
     <div
       style={{
