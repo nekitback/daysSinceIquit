@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import '@rainbow-me/rainbowkit/styles.css'
+import '@coinbase/onchainkit/styles.css'
 import './index.css'
 import App from './App'
 
@@ -16,6 +17,11 @@ import {
 import { WagmiProvider, createConfig, http } from 'wagmi'
 import { base } from 'wagmi/chains'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import { OnchainKitProvider } from '@coinbase/onchainkit'
+
+// Extract API key from Paymaster URL
+const PAYMASTER_URL = import.meta.env.VITE_PAYMASTER_URL || ''
+const CDP_API_KEY = PAYMASTER_URL.split('/').pop() || ''
 
 const connectors = connectorsForWallets(
   [
@@ -53,9 +59,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider modalSize="compact">
-          <App />
-        </RainbowKitProvider>
+        <OnchainKitProvider
+          apiKey={CDP_API_KEY}
+          chain={base}
+          config={{
+            appearance: {
+              mode: 'auto',
+            },
+          }}
+        >
+          <RainbowKitProvider modalSize="compact">
+            <App />
+          </RainbowKitProvider>
+        </OnchainKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   </React.StrictMode>,

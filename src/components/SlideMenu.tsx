@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useAccount, useDisconnect } from 'wagmi'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle, ChevronRight, User } from 'lucide-react'
+import { X, Info, Settings, LogOut, Heart, AlertCircle, ExternalLink, MessageCircle, ChevronRight } from 'lucide-react'
 import DonationModal from './DonationModal'
 import AboutModal from './AboutModal'
 import Toast from './Toast'
 import SettingsComponent from './Settings'
-import { useBasename } from '../hooks/useBasename'
+import { Identity, Name, Avatar, Badge } from '@coinbase/onchainkit/identity'
 
 interface Props {
   isOpen: boolean
@@ -16,7 +16,6 @@ interface Props {
 export default function SlideMenu({ isOpen, onClose }: Props) {
   const { address } = useAccount()
   const { disconnect } = useDisconnect()
-  const { name: basename, avatar, isLoading: isLoadingBasename } = useBasename()
   const [showDonation, setShowDonation] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -68,50 +67,35 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                   </button>
                 </div>
 
-                {/* User Identity Card */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl p-4">
-                  <div className="flex items-center gap-3">
-                    {/* Avatar */}
-                    {avatar ? (
-                      <img 
-                        src={avatar} 
-                        alt="Avatar" 
-                        className="w-12 h-12 rounded-full object-cover border-2 border-blue-300 dark:border-blue-500"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center">
-                        <User className="w-6 h-6 text-white" />
-                      </div>
-                    )}
-                    
-                    {/* Name & Address */}
-                    <div className="flex-1 min-w-0">
-                      {isLoadingBasename ? (
-                        <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      ) : (
-                        <p className="font-bold text-gray-900 dark:text-white truncate">
-                          {basename || 'Anonymous'}
-                        </p>
-                      )}
-                      {basename && address && (
+                {/* User Identity Card - OnchainKit */}
+                {address && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl p-4">
+                    <Identity
+                      address={address}
+                      schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
+                      className="!bg-transparent !p-0 !gap-3"
+                    >
+                      <Avatar className="!w-12 !h-12 !rounded-full !border-2 !border-blue-300 dark:!border-blue-500" />
+                      <div className="flex flex-col min-w-0">
+                        <Name className="!font-bold !text-gray-900 dark:!text-white !text-base truncate">
+                          <Badge />
+                        </Name>
                         <p className="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">
                           {address.slice(0, 6)}...{address.slice(-4)}
                         </p>
-                      )}
-                      {!basename && !isLoadingBasename && (
                         <a 
                           href="https://www.base.org/names" 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
                         >
                           Get your Basename
                           <ExternalLink className="w-3 h-3" />
                         </a>
-                      )}
-                    </div>
+                      </div>
+                    </Identity>
                   </div>
-                </div>
+                )}
               </div>
 
               <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

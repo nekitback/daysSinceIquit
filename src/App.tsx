@@ -54,12 +54,11 @@ function App() {
     customName,
   } = useStore()
 
-  const { startCounter, isPending, isSponsored } = useStartCounter()
+  const { startCounter, isPending } = useStartCounter()
 
   const { 
     startCounterWithCustomTime, 
     isPending: isPendingCustom, 
-    isSponsored: isSponsoredCustom,
   } = useStartCounterWithCustomTime()
 
   const { resetCounter } = useResetCounter()
@@ -421,7 +420,7 @@ function App() {
                   <Menu className="w-6 h-6 text-gray-700 dark:text-gray-300" />
                 </button>
                 
-                <Logo size="small" showText={true} />
+                <Logo size="small" showText={false} />
               </div>
 
               <UserButton />
@@ -462,48 +461,32 @@ function App() {
                   onDateChange={setCustomStartDate}
                 />
                 
-                <div className="space-y-2">
-                  <button
-                    onClick={handleQuit}
-                    disabled={
-                      isPending || 
-                      isPendingCustom ||
-                      createPendingTx !== undefined
-                    }
-                    className="w-full px-6 min-h-[52px] rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
-                    style={{
-                      background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
-                    }}
-                  >
-                    {(isPending || isPendingCustom) ? (
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Confirm in wallet...</span>
-                      </div>
-                    ) : createPendingTx ? (
-                      <div className="flex items-center justify-center gap-3">
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        <span>Processing...</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <span>I Quit!</span>
-                        {(isSponsored || isSponsoredCustom) && (
-                          <span className="px-2 py-0.5 bg-green-400/30 text-green-100 text-xs font-semibold rounded-full">
-                            FREE
-                          </span>
-                        )}
-                        <span>🚀</span>
-                      </div>
-                    )}
-                  </button>
-                  
-                  {(isSponsored || isSponsoredCustom) && (
-                    <p className="text-center text-xs text-green-600 dark:text-green-400">
-                      ✨ Gas fees sponsored by Base
-                    </p>
+                <button
+                  onClick={handleQuit}
+                  disabled={
+                    isPending || 
+                    isPendingCustom ||
+                    createPendingTx !== undefined
+                  }
+                  className="w-full px-6 min-h-[52px] rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-white"
+                  style={{
+                    background: `linear-gradient(to right, ${selectedColor}, ${selectedColor}dd)`,
+                  }}
+                >
+                  {(isPending || isPendingCustom) ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Confirm in wallet...</span>
+                    </div>
+                  ) : createPendingTx ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Processing...</span>
+                    </div>
+                  ) : (
+                    'I Quit! 🚀'
                   )}
-                </div>
+                </button>
               </div>
             </section>
 
