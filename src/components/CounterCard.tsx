@@ -68,8 +68,8 @@ export default function CounterCard({
     ? counter.longestStreak 
     : currentStreak
 
-  // Share functionality
-  const appUrl = 'https://dsiq.app'
+  // Share functionality - URL from env or fallback
+  const appUrl = import.meta.env.VITE_APP_URL || 'https://days-since-iquit.vercel.app'
   const shareText = `🎉 I've been ${counter.category}-free for ${currentDays} days!
 
 Tracking my progress with Days Since I Quit on Base.
@@ -204,20 +204,21 @@ ${appUrl}`
         </div>
 
         {/* Action Buttons - min 44px touch targets */}
-        <div className="flex gap-2 mt-6">
+        <div className="flex flex-wrap gap-2 mt-6">
+          {/* Row 1: Pause/Resume + Reset */}
           <button
             onClick={() => isPaused ? onResume(counter.id) : onPause(counter.id)}
             disabled={isLoading}
-            className="flex-1 px-4 min-h-[44px] bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-w-[100px] px-3 min-h-[44px] bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
             {isPaused ? (
               <>
-                <Play className="w-5 h-5" />
+                <Play className="w-4 h-4" />
                 Resume
               </>
             ) : (
               <>
-                <Pause className="w-5 h-5" />
+                <Pause className="w-4 h-4" />
                 Pause
               </>
             )}
@@ -226,9 +227,9 @@ ${appUrl}`
           <button
             onClick={() => onReset(counter.id)}
             disabled={isLoading}
-            className="flex-1 px-4 min-h-[44px] bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-300 border border-red-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-w-[100px] px-3 min-h-[44px] bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-300 border border-red-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
           >
-            <RotateCcw className="w-5 h-5" />
+            <RotateCcw className="w-4 h-4" />
             Reset
           </button>
 
@@ -237,9 +238,9 @@ ${appUrl}`
             <button
               onClick={() => setShowShareMenu(!showShareMenu)}
               disabled={isLoading}
-              className="px-4 min-h-[44px] min-w-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 min-h-[44px] min-w-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-4 h-4" />
             </button>
 
             {/* Share Menu Popup */}
@@ -303,9 +304,9 @@ ${appUrl}`
           <button
             onClick={() => onDelete(counter.id)}
             disabled={isLoading} 
-            className="px-4 min-h-[44px] min-w-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 min-h-[44px] min-w-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Trash2 className="w-5 h-5" />
+            <Trash2 className="w-4 h-4" />
           </button>
         </div>
       </div> 

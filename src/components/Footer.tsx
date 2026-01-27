@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react'
 
 export default function Footer() {
   return (
-    <footer className="relative mt-16 overflow-hidden">
+    <footer className="relative mt-16 overflow-hidden rounded-t-2xl">
       {/* Animated gradient background - Light theme */}
       <div 
         className="absolute inset-0 animate-gradient-x block dark:hidden"

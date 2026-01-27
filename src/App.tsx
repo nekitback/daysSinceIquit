@@ -478,7 +478,7 @@ function App() {
       {theme === 'light' && <SunRaysBackground />}
       
       <div className="relative" style={{ zIndex: 10 }}>
-        <header className="relative sticky top-0 z-30 overflow-hidden">
+        <header className="relative sticky top-0 z-30 overflow-hidden rounded-b-2xl">
           {/* Animated gradient background - Light theme */}
           <div 
             className="absolute inset-0 animate-gradient-x block dark:hidden"
