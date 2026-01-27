@@ -490,7 +490,7 @@ export default function StatisticsModal({ isOpen, onClose }: Props) {
                           <div className="mt-4 relative">
                             <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-300 dark:bg-gray-600 -translate-y-1/2" />
                             <div className="flex justify-between relative">
-                              {stats.counters.slice(0, 5).map((counter, index) => (
+                              {stats.counters.slice(0, 5).map((counter) => (
                                 <div 
                                   key={counter.id}
                                   className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-900"
