@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Menu, ExternalLink, CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { ConnectWallet, Wallet } from '@coinbase/onchainkit/wallet'
 import UserButton from './components/UserButton'
 import PendingCounterCard from './components/PendingCounterCard'
 import CounterCard from './components/CounterCard'
@@ -389,7 +389,9 @@ function App() {
           </p>
           
           <div className="flex justify-center">
-            <ConnectButton />
+            <Wallet>
+              <ConnectWallet className="!px-6 !py-3 !text-lg !font-semibold !rounded-xl" />
+            </Wallet>
           </div>
           
           <p className="text-gray-500 dark:text-gray-600 text-sm mt-6">

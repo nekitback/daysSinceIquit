@@ -6,7 +6,7 @@ import DonationModal from './DonationModal'
 import AboutModal from './AboutModal'
 import Toast from './Toast'
 import SettingsComponent from './Settings'
-import { Identity, Name, Avatar, Badge } from '@coinbase/onchainkit/identity'
+import { Identity, Name, Avatar, Address } from '@coinbase/onchainkit/identity'
 
 interface Props {
   isOpen: boolean
@@ -70,28 +70,25 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                 {/* User Identity Card - OnchainKit */}
                 {address && (
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-500/10 dark:to-indigo-500/10 border border-blue-200 dark:border-blue-500/30 rounded-xl p-4">
-                    <Identity
+                    <Identity 
                       address={address}
-                      schemaId="0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9"
-                      className="!bg-transparent !p-0 !gap-3"
+                      className="!bg-transparent !p-0"
                     >
-                      <Avatar className="!w-12 !h-12 !rounded-full !border-2 !border-blue-300 dark:!border-blue-500" />
-                      <div className="flex flex-col min-w-0">
-                        <Name className="!font-bold !text-gray-900 dark:!text-white !text-base truncate">
-                          <Badge />
-                        </Name>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono truncate">
-                          {address.slice(0, 6)}...{address.slice(-4)}
-                        </p>
-                        <a 
-                          href="https://www.base.org/names" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
-                        >
-                          Get your Basename
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
+                      <div className="flex items-center gap-3">
+                        <Avatar className="!w-12 !h-12 !rounded-full !border-2 !border-blue-300 dark:!border-blue-500" />
+                        <div className="flex-1 min-w-0">
+                          <Name className="!font-bold !text-gray-900 dark:!text-white !text-base" />
+                          <Address className="!text-xs !text-gray-500 dark:!text-gray-400 !font-mono" />
+                          <a 
+                            href="https://www.base.org/names" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 mt-1"
+                          >
+                            Get your Basename
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
                       </div>
                     </Identity>
                   </div>
