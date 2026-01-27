@@ -235,14 +235,14 @@ ${appUrl}`
             </button>
           </div>
 
-          {/* Row 2: Share + Delete (right aligned) */}
-          <div className="flex justify-end gap-2">
+          {/* Row 2: Share + Delete (equal width) */}
+          <div className="flex gap-2">
             {/* Share Button */}
-            <div className="relative">
+            <div className="relative flex-1">
               <button
                 onClick={() => setShowShareMenu(!showShareMenu)}
                 disabled={isLoading}
-                className="px-4 min-h-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                className="w-full min-h-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               >
                 <Share2 className="w-4 h-4" />
                 Share
@@ -309,7 +309,7 @@ ${appUrl}`
             <button
               onClick={() => onDelete(counter.id)}
               disabled={isLoading} 
-              className="px-4 min-h-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:border-red-500/30 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="flex-1 min-h-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:border-red-500/30 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               <Trash2 className="w-4 h-4" />
               Delete

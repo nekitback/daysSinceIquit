@@ -100,9 +100,9 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                 stiffness: 300,
                 mass: 0.8
               }}
-              className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 z-50 shadow-2xl will-change-transform"
+              className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 z-50 shadow-2xl will-change-transform flex flex-col"
             >
-              <div className="p-6 border-b border-gray-200 dark:border-gray-800">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-bold text-gray-900 dark:text-white">Menu</h2>
                   <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
@@ -277,19 +277,19 @@ export default function SlideMenu({ isOpen, onClose }: Props) {
                 </div>
               </nav>
 
-              <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
                 <button
                   onClick={() => {
                     disconnect()
                     onClose()
                   }}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-100 dark:bg-red-500/20 hover:bg-red-200 dark:hover:bg-red-500/30 text-red-700 dark:text-red-400 rounded-xl font-semibold transition-colors border border-red-300 dark:border-red-500/30"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-100 dark:bg-red-500/20 hover:bg-red-200 dark:hover:bg-red-500/30 text-red-700 dark:text-red-400 rounded-xl font-semibold transition-colors border border-red-300 dark:border-red-500/30 min-h-[44px]"
                 >
                   <LogOut className="w-5 h-5" />
                   Disconnect
                 </button>
                 
-                <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-4">
+                <p className="text-center text-xs text-gray-500 dark:text-gray-500 mt-3">
                   Built on <span className="font-semibold text-blue-600 dark:text-blue-400">Base</span> 
                 </p>
               </div>

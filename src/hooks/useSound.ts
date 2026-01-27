@@ -26,30 +26,30 @@ function playTone(frequency: number, duration: number, type: OscillatorType = 's
   oscillator.stop(audioContext.currentTime + duration)
 }
 
-// Soft, muted sound presets - lower frequencies for warmer tone
+// Sound presets - warm tones with adequate volume
 const sounds: Record<SoundType, () => void> = {
-  // Soft click - muted, warm tap sound (lowered frequency)
+  // Click - warm tap sound (audible but not harsh)
   click: () => {
-    playTone(280, 0.04, 'triangle', 0.06)
+    playTone(320, 0.05, 'triangle', 0.2)
   },
   
-  // Success - warm ascending chime (lowered frequencies)
+  // Success - ascending chime
   success: () => {
-    playTone(330, 0.12, 'triangle', 0.08) // E4
-    setTimeout(() => playTone(392, 0.12, 'triangle', 0.08), 100) // G4
-    setTimeout(() => playTone(494, 0.15, 'triangle', 0.06), 200) // B4
+    playTone(330, 0.12, 'triangle', 0.25) // E4
+    setTimeout(() => playTone(392, 0.12, 'triangle', 0.22), 100) // G4
+    setTimeout(() => playTone(494, 0.15, 'triangle', 0.18), 200) // B4
   },
   
   // Error - soft low tone
   error: () => {
-    playTone(180, 0.15, 'triangle', 0.06)
-    setTimeout(() => playTone(150, 0.2, 'triangle', 0.05), 100)
+    playTone(180, 0.15, 'triangle', 0.2)
+    setTimeout(() => playTone(150, 0.2, 'triangle', 0.15), 100)
   },
   
-  // Pop - muted satisfying pop
+  // Pop - satisfying pop
   pop: () => {
-    playTone(350, 0.06, 'triangle', 0.07)
-    setTimeout(() => playTone(450, 0.04, 'triangle', 0.04), 25)
+    playTone(380, 0.06, 'triangle', 0.22)
+    setTimeout(() => playTone(480, 0.04, 'triangle', 0.15), 25)
   },
 }
 
