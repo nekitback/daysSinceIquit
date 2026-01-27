@@ -204,110 +204,117 @@ ${appUrl}`
         </div>
 
         {/* Action Buttons - min 44px touch targets */}
-        <div className="flex flex-wrap gap-2 mt-6">
+        <div className="mt-6 space-y-2">
           {/* Row 1: Pause/Resume + Reset */}
-          <button
-            onClick={() => isPaused ? onResume(counter.id) : onPause(counter.id)}
-            disabled={isLoading}
-            className="flex-1 min-w-[100px] px-3 min-h-[44px] bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-          >
-            {isPaused ? (
-              <>
-                <Play className="w-4 h-4" />
-                Resume
-              </>
-            ) : (
-              <>
-                <Pause className="w-4 h-4" />
-                Pause
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={() => onReset(counter.id)}
-            disabled={isLoading}
-            className="flex-1 min-w-[100px] px-3 min-h-[44px] bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-300 border border-red-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset
-          </button>
-
-          {/* Share Button */}
-          <div className="relative">
+          <div className="flex gap-2">
             <button
-              onClick={() => setShowShareMenu(!showShareMenu)}
+              onClick={() => isPaused ? onResume(counter.id) : onPause(counter.id)}
               disabled={isLoading}
-              className="px-3 min-h-[44px] min-w-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-3 min-h-[44px] bg-blue-500/20 hover:bg-blue-500/30 text-blue-600 dark:text-blue-300 border border-blue-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
-              <Share2 className="w-4 h-4" />
-            </button>
-
-            {/* Share Menu Popup */}
-            <AnimatePresence>
-              {showShareMenu && (
+              {isPaused ? (
                 <>
-                  {/* Backdrop */}
-                  <div 
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowShareMenu(false)}
-                  />
-                  
-                  {/* Menu */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                    className="absolute right-0 bottom-full mb-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
-                  >
-                    <div className="p-2">
-                      <p className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
-                        Share your progress
-                      </p>
-                      
-                      {/* Base App / Warpcast */}
-                      <button
-                        onClick={shareToBaseApp}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      >
-                        <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" stroke="currentColor" fill="none"/>
-                          </svg>
-                        </div>
-                        <div className="text-left">
-                          <p className="font-medium text-gray-900 dark:text-white text-sm">Base / Warpcast</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Post to your feed</p>
-                        </div>
-                      </button>
-
-                      {/* Generic Share / Copy */}
-                      <button
-                        onClick={shareGeneric}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                      >
-                        <div className="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
-                          <Share2 className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="text-left">
-                          <p className="font-medium text-gray-900 dark:text-white text-sm">More options</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Messengers & copy link</p>
-                        </div>
-                      </button>
-                    </div>
-                  </motion.div>
+                  <Play className="w-4 h-4" />
+                  Resume
+                </>
+              ) : (
+                <>
+                  <Pause className="w-4 h-4" />
+                  Pause
                 </>
               )}
-            </AnimatePresence>
+            </button>
+
+            <button
+              onClick={() => onReset(counter.id)}
+              disabled={isLoading}
+              className="flex-1 px-3 min-h-[44px] bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-300 border border-red-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset
+            </button>
           </div>
 
-          <button
-            onClick={() => onDelete(counter.id)}
-            disabled={isLoading} 
-            className="px-3 min-h-[44px] min-w-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {/* Row 2: Share + Delete (right aligned) */}
+          <div className="flex justify-end gap-2">
+            {/* Share Button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowShareMenu(!showShareMenu)}
+                disabled={isLoading}
+                className="px-4 min-h-[44px] bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-300 border border-green-500/30 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
+
+              {/* Share Menu Popup */}
+              <AnimatePresence>
+                {showShareMenu && (
+                  <>
+                    {/* Backdrop */}
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowShareMenu(false)}
+                    />
+                    
+                    {/* Menu */}
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                      className="absolute right-0 bottom-full mb-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 overflow-hidden"
+                    >
+                      <div className="p-2">
+                        <p className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+                          Share your progress
+                        </p>
+                        
+                        {/* Base App / Warpcast */}
+                        <button
+                          onClick={shareToBaseApp}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        >
+                          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" strokeWidth="2" stroke="currentColor" fill="none"/>
+                            </svg>
+                          </div>
+                          <div className="text-left">
+                            <p className="font-medium text-gray-900 dark:text-white text-sm">Base / Warpcast</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Post to your feed</p>
+                          </div>
+                        </button>
+
+                        {/* Generic Share / Copy */}
+                        <button
+                          onClick={shareGeneric}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                        >
+                          <div className="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center">
+                            <Share2 className="w-4 h-4 text-white" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-medium text-gray-900 dark:text-white text-sm">More options</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Messengers & copy link</p>
+                          </div>
+                        </button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <button
+              onClick={() => onDelete(counter.id)}
+              disabled={isLoading} 
+              className="px-4 min-h-[44px] bg-gray-200/50 dark:bg-gray-700/50 hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:border-red-500/30 text-gray-700 dark:text-gray-300 border border-gray-300/50 dark:border-gray-600/50 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+          </div>
         </div>
       </div> 
     </div>

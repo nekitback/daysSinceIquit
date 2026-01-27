@@ -194,12 +194,15 @@ export default function StatisticsModal({ isOpen, onClose }: Props) {
         currentStreak = now - startedAt - totalPausedTime
       }
       
+      // Fix: If longestStreak is 0 (contract bug with custom date), use currentStreak
+      const displayLongestStreak = longestStreak > 0 ? longestStreak : currentStreak
+      
       return {
         id: Number(id),
         category: data.category,
         color: data.color,
         currentStreak: Math.floor(currentStreak / 86400),
-        longestStreak: Math.floor(longestStreak / 86400),
+        longestStreak: Math.floor(displayLongestStreak / 86400),
         totalResets: Number(data.totalResets),
         startedAt,
         isPaused: pausedAt > 0,
