@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Pause, Play, RotateCcw, Trash2, Loader2, ExternalLink, Share2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useStore } from '../store/useStore'
 import type { Counter } from '../types'
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
   onDelete: (id: number) => void
 }
 
+const CONTRACT_ADDRESS = '0x6b38dD227700F01Dc9Ee2d6DfCCadfD33bFb4028'
+
 export default function CounterCard({ 
   counter, 
   isLoading,
@@ -20,6 +23,8 @@ export default function CounterCard({
   onResume, 
   onDelete 
 }: Props) {
+  const counterTxHashes = useStore((state) => state.counterTxHashes)
+  const txHash = counterTxHashes[counter.id]
   const [currentTime, setCurrentTime] = useState(Date.now())
   const [showShareMenu, setShowShareMenu] = useState(false)
 
@@ -158,12 +163,15 @@ ${appUrl}`
               </p>
               <span className="text-gray-400 dark:text-gray-600">•</span>
               <a
-                href={`https://basescan.org/address/0x6b38dD227700F01Dc9Ee2d6DfCCadfD33bFb4028`}
+                href={txHash 
+                  ? `https://basescan.org/tx/${txHash}`
+                  : `https://basescan.org/address/${CONTRACT_ADDRESS}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 flex items-center gap-1 text-sm font-medium"
               >
-                View onchain
+                {txHash ? 'View tx' : 'View onchain'}
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>

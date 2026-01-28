@@ -9,6 +9,9 @@ interface ExtendedStoreState extends StoreState {
   customDateCounterIds: number[]
   addCustomDateCounter: (id: number) => void
   removeCustomDateCounter: (id: number) => void
+  // Store tx hashes for counters (counterId -> txHash)
+  counterTxHashes: Record<number, string>
+  setCounterTxHash: (counterId: number, txHash: string) => void
 }
 
 export const useStore = create<ExtendedStoreState>()(
@@ -20,6 +23,7 @@ export const useStore = create<ExtendedStoreState>()(
       customName: '',
       soundEnabled: true, // Sound effects enabled by default
       customDateCounterIds: [], // IDs of counters created with custom date
+      counterTxHashes: {}, // Map of counterId -> creation tx hash
       
       setSelectedColor: (color) => set({ selectedColor: color }),
       setSelectedCategory: (category) => set({ selectedCategory: category }),
@@ -34,6 +38,11 @@ export const useStore = create<ExtendedStoreState>()(
       removeCustomDateCounter: (id) =>
         set((state) => ({
           customDateCounterIds: state.customDateCounterIds.filter((i) => i !== id),
+        })),
+      
+      setCounterTxHash: (counterId, txHash) =>
+        set((state) => ({
+          counterTxHashes: { ...state.counterTxHashes, [counterId]: txHash },
         })),
       
       addCounter: (counter) =>

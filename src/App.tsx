@@ -60,6 +60,7 @@ function App() {
     selectedCategory, 
     customName,
     addCustomDateCounter,
+    setCounterTxHash,
   } = useStore()
   const { play: playSound } = useSound()
   
@@ -176,7 +177,36 @@ function App() {
         localStorage.removeItem('dsiq-pending-custom-dates')
       }
     }
-  }, [activeCounters, address, addCustomDateCounter])
+    
+    // Process pending tx hashes - match with newly created counters
+    const pendingTxHashes = JSON.parse(localStorage.getItem('dsiq-pending-tx-hashes') || '[]') as Array<{hash: string, category: string, timestamp: number}>
+    if (pendingTxHashes.length > 0) {
+      const remainingPendingTx: typeof pendingTxHashes = []
+      
+      pendingTxHashes.forEach((pending) => {
+        // Find counter with matching category created recently (within 5 min)
+        const fiveMinAgo = Date.now() - 5 * 60 * 1000
+        if (pending.timestamp > fiveMinAgo) {
+          const matchingCounter = merged.find(c => 
+            c.category === pending.category && 
+            !Object.keys(useStore.getState().counterTxHashes).includes(String(c.id))
+          )
+          if (matchingCounter) {
+            setCounterTxHash(matchingCounter.id, pending.hash)
+          } else {
+            remainingPendingTx.push(pending)
+          }
+        }
+        // Old pending entries are discarded
+      })
+      
+      if (remainingPendingTx.length > 0) {
+        localStorage.setItem('dsiq-pending-tx-hashes', JSON.stringify(remainingPendingTx))
+      } else {
+        localStorage.removeItem('dsiq-pending-tx-hashes')
+      }
+    }
+  }, [activeCounters, address, addCustomDateCounter, setCounterTxHash])
 
   useEffect(() => {
     if (!isConnected) {
@@ -380,6 +410,10 @@ function App() {
         setPendingTxs(prev => prev.filter(t => t.hash !== tx.hash))
         
         if (tx.type === 'create') {
+          // Store tx hash for later matching with counter
+          const pendingTxHashes = JSON.parse(localStorage.getItem('dsiq-pending-tx-hashes') || '[]')
+          pendingTxHashes.push({ hash: tx.hash, category: tx.category, timestamp: Date.now() })
+          localStorage.setItem('dsiq-pending-tx-hashes', JSON.stringify(pendingTxHashes))
           showToast('✅ Counter created!', 'success')
         } else if (tx.type === 'delete') {
           showToast('✅ Counter deleted!', 'success')

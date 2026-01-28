@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trophy, Lock, Info } from 'lucide-react'
+import { X, Trophy, Lock, Info, Star } from 'lucide-react'
 import { useGetActiveCounters } from '../hooks/useContract'
 import { useStore } from '../store/useStore'
 import { useAccount } from 'wagmi'
+import { useOGStatus } from '../hooks/useOGStatus'
 
 interface Props {
   isOpen: boolean
@@ -24,6 +25,7 @@ export default function AchievementsModal({ isOpen, onClose }: Props) {
   const { address } = useAccount()
   const { counters: activeCounters } = useGetActiveCounters()
   const customDateCounterIds = useStore((state) => state.customDateCounterIds)
+  const { isOG, ogRank, isLoading: isOGLoading } = useOGStatus()
 
   // Calculate unlocked achievements based on eligible counters
   const getUnlockedDays = (): Set<number> => {
@@ -142,6 +144,56 @@ export default function AchievementsModal({ isOpen, onClose }: Props) {
 
               {/* Content */}
               <div className="p-6 space-y-4 overflow-y-auto max-h-[50vh]">
+                
+                {/* OG Badge - Special Section */}
+                <div className={`relative p-4 rounded-xl border-2 transition-all ${
+                  isOG
+                    ? 'bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-500/10 dark:to-indigo-500/10 border-purple-300 dark:border-purple-500/50'
+                    : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 opacity-60'
+                }`}>
+                  <div className="flex items-center gap-4">
+                    <div className={`relative w-16 h-16 ${!isOG ? 'grayscale' : ''}`}>
+                      <img
+                        src="/badge_OG.png"
+                        alt="OG Badge"
+                        className="w-full h-full object-contain"
+                      />
+                      {!isOG && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Lock className="w-6 h-6 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className={`font-bold ${
+                          isOG 
+                            ? 'text-purple-700 dark:text-purple-400' 
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          OG User
+                        </p>
+                        {isOG && (
+                          <Star className="w-4 h-4 text-purple-500 fill-purple-500" />
+                        )}
+                      </div>
+                      <p className={`text-xs mt-0.5 ${
+                        isOG 
+                          ? 'text-purple-600 dark:text-purple-300' 
+                          : 'text-gray-400 dark:text-gray-500'
+                      }`}>
+                        {isOGLoading ? 'Checking...' : isOG ? `#${ogRank} of first 100 users` : 'First 100 users only'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">
+                    Streak Achievements
+                  </p>
+                </div>
+
                 {/* Achievement Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {ACHIEVEMENTS.map((achievement) => {
