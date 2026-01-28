@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
+    "payload": "eyJkb21haW4iOiJkYXlzLXNpbmNlLWlxdWl0LnZlcmNlbC5hcHAifQ",
+    "signature": "MHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Days Since I Quit",
+    "iconUrl": "https://days-since-iquit.vercel.app/logo.png",
+    "homeUrl": "https://days-since-iquit.vercel.app",
+    "imageUrl": "https://days-since-iquit.vercel.app/cover.png?v=3",
+    "buttonTitle": "Open App",
+    "splashImageUrl": "https://days-since-iquit.vercel.app/logo.png",
+    "splashBackgroundColor": "#0f172a",
+    "webhookUrl": ""
+  }
+}

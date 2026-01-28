@@ -3,6 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     
+    <!-- Prevent theme flash - apply saved theme immediately -->
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('dsiq-theme');
+          if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+    
     <!-- Base Mini App -->
     <meta name="base:app_id" content="69768ee288e3bac59cf3d8bc" />
     <meta name="base:builder_code" content="bc_2i18vtg6" />
@@ -61,6 +73,11 @@
     <meta property="fc:frame:button:1" content="🚀 Open App" />
     <meta property="fc:frame:button:1:action" content="link" />
     <meta property="fc:frame:button:1:target" content="https://days-since-iquit.vercel.app" />
+    
+    <!-- Base Mini App Embed -->
+    <meta name="fc:frame:miniapp" content="true" />
+    <meta property="of:version" content="vNext" />
+    <meta property="of:accepts:farcaster" content="vNext" />
     
     <title>Days Since I Quit | Onchain Habit Tracker</title>
   </head>

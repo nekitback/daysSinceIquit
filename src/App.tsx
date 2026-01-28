@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi'
 import { Menu, ExternalLink, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { ConnectWallet, Wallet } from '@coinbase/onchainkit/wallet'
+import sdk from '@farcaster/frame-sdk'
 import PendingCounterCard from './components/PendingCounterCard'
 import CounterCard from './components/CounterCard'
 import ColorPicker from './components/ColorPicker'
@@ -47,6 +48,11 @@ function App() {
   useEffect(() => {
     applyTheme(theme)
   }, [theme])
+
+  // Signal to Base App that the mini app is ready
+  useEffect(() => {
+    sdk.actions.ready()
+  }, [])
 
   const [menuOpen, setMenuOpen] = useState(false)
   const { 
