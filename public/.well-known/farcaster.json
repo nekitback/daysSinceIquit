@@ -8,21 +8,24 @@
     "version": "1",
     "name": "Days Since I Quit",
     "homeUrl": "https://days-since-iquit.vercel.app",
-    "iconUrl": "https://days-since-iquit.vercel.app/logo.png",
+    "iconUrl": "https://days-since-iquit.vercel.app/Logo.png",
     "imageUrl": "https://days-since-iquit.vercel.app/cover.png",
     "buttonTitle": "Open App",
-    "splashImageUrl": "https://days-since-iquit.vercel.app/logo.png",
+    "splashImageUrl": "https://days-since-iquit.vercel.app/Logo.png",
     "splashBackgroundColor": "#0f172a",
     "subtitle": "Onchain habit tracker",
     "description": "Track your habit-breaking journey onchain. Create counters, watch streaks grow, pause when needed. Your progress is permanent and owned by you.",
-    "screenshotUrls": [],
+    "screenshotUrls": [
+      "https://days-since-iquit.vercel.app/screenshot1.png",
+      "https://days-since-iquit.vercel.app/screenshot2.png",
+      "https://days-since-iquit.vercel.app/screenshot3.png"
+    ],
     "primaryCategory": "utility",
     "tags": ["habits", "health", "onchain", "tracker", "base"],
     "heroImageUrl": "https://days-since-iquit.vercel.app/cover.png",
     "tagline": "Break habits. Track onchain.",
     "ogTitle": "Days Since I Quit",
     "ogDescription": "Track your habit-breaking journey onchain. Your progress is permanent.",
-    "ogImageUrl": "https://days-since-iquit.vercel.app/cover.png",
-    "noindex": false
+    "ogImageUrl": "https://days-since-iquit.vercel.app/cover.png"
   }
 }
