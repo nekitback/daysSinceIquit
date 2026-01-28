@@ -66,18 +66,21 @@
     <meta name="twitter:image" content="https://days-since-iquit.vercel.app/cover.png?v=3" />
     <meta name="twitter:image:alt" content="Days Since I Quit - Onchain habit tracker on Base" />
     
-    <!-- Farcaster Frame -->
-    <meta property="fc:frame" content="vNext" />
-    <meta property="fc:frame:image" content="https://days-since-iquit.vercel.app/cover.png?v=3" />
-    <meta property="fc:frame:image:aspect_ratio" content="1.91:1" />
-    <meta property="fc:frame:button:1" content="🚀 Open App" />
-    <meta property="fc:frame:button:1:action" content="link" />
-    <meta property="fc:frame:button:1:target" content="https://days-since-iquit.vercel.app" />
-    
     <!-- Base Mini App Embed -->
-    <meta name="fc:frame:miniapp" content="true" />
-    <meta property="of:version" content="vNext" />
-    <meta property="of:accepts:farcaster" content="vNext" />
+    <meta name="fc:miniapp" content='{
+      "version": "next",
+      "imageUrl": "https://days-since-iquit.vercel.app/cover.png",
+      "button": {
+        "title": "Open App",
+        "action": {
+          "type": "launch_miniapp",
+          "name": "Days Since I Quit",
+          "url": "https://days-since-iquit.vercel.app",
+          "splashImageUrl": "https://days-since-iquit.vercel.app/logo.png",
+          "splashBackgroundColor": "#0f172a"
+        }
+      }
+    }' />
     
     <title>Days Since I Quit | Onchain Habit Tracker</title>
   </head>
