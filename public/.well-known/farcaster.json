@@ -22,10 +22,10 @@
     ],
     "primaryCategory": "utility",
     "tags": ["habits", "health", "onchain", "tracker", "base"],
-    "heroImageUrl": "https://days-since-iquit.vercel.app/cover.png",
+    "heroImageUrl": "https://days-since-iquit.vercel.app/coverBaseV2.png",
     "tagline": "Break habits. Track onchain.",
     "ogTitle": "Days Since I Quit",
     "ogDescription": "Track your habit-breaking journey onchain. Your progress is permanent.",
-    "ogImageUrl": "https://days-since-iquit.vercel.app/cover.png"
+    "ogImageUrl": "https://days-since-iquit.vercel.app/coverBaseV2.png"
   }
 }
