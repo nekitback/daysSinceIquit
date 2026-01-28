@@ -154,7 +154,7 @@ export default function AchievementsModal({ isOpen, onClose }: Props) {
                   <div className="flex items-center gap-4">
                     <div className={`relative w-16 h-16 ${!isOG ? 'grayscale' : ''}`}>
                       <img
-                        src="/badge_OG.png"
+                        src="/badges/badge_OG.png"
                         alt="OG Badge"
                         className="w-full h-full object-contain"
                       />
