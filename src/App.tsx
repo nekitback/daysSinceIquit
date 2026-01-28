@@ -347,22 +347,28 @@ function App() {
 
     useEffect(() => {
       if (isSuccess) {
+        // Refetch with delay to ensure blockchain state is updated
+        const doRefetch = async () => {
+          // Small delay to let blockchain state settle
+          await new Promise(resolve => setTimeout(resolve, 500))
+          await refetch()
+          // Second refetch after another delay for reliability
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          await refetch()
+        }
+        
         // If this was a create with custom date, mark the counter as ineligible for achievements
         if (tx.type === 'create' && tx.customStartDate) {
-          // After refetch, find the counter with matching startedAt and mark it
-          refetch().then(() => {
-            // We need to find the newly created counter by its startedAt matching customStartDate
-            // This will be handled by watching activeCounters changes
+          doRefetch().then(() => {
             const pendingCustomDate = tx.customStartDate
             if (pendingCustomDate) {
-              // Store in localStorage for post-refetch processing
               const pending = JSON.parse(localStorage.getItem('dsiq-pending-custom-dates') || '[]')
               pending.push(pendingCustomDate)
               localStorage.setItem('dsiq-pending-custom-dates', JSON.stringify(pending))
             }
           })
         } else {
-          refetch()
+          doRefetch()
         }
         
         setPendingTxs(prev => prev.filter(t => t.hash !== tx.hash))

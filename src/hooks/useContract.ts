@@ -123,6 +123,9 @@ export function useGetActiveCounters() {
     args: address ? [address] : undefined,
     query: {
       enabled: !!address,
+      staleTime: 0, // Always consider data stale
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
     },
   })
 
