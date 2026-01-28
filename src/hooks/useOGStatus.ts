@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAccount, usePublicClient } from 'wagmi'
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../constants/contract'
+import { CONTRACT_ADDRESS } from '../constants/contract'
 
 // Cache for OG users list
 let ogUsersCache: string[] | null = null
